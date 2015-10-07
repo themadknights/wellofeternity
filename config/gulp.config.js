@@ -8,18 +8,11 @@ module.exports = {
     },
     files: {
         scripts: `${sourceFolder}/js/**/*.js`,
-        templates: `${sourceFolder}/templates/**/*.html`,
-        libs: [
-            './node_modules/systemjs/dist/system.js'
-        ]
+        templates: `${sourceFolder}/templates/**/*.html`
     },
     scripts: {
         destFolder: `${destFolder}/js`,
         outFile: 'index.js'
-    },
-    libs: {
-        destFolder: `${destFolder}/js`,
-        outFile: 'libs.js'
     },
     server: {
         root: destFolder,
