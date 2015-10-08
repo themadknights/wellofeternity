@@ -14,7 +14,8 @@ module.exports = {
         templates: `${sourceFolder}/templates/**/*.html`,
         libs: [
             './node_modules/phaser/dist/phaser.min.js'
-        ]
+        ],
+        styles: `${sourceFolder}/styles/**/*.css`
     },
     scripts: {
         destFolder: `${destFolder}/js`,
@@ -23,6 +24,10 @@ module.exports = {
     libs: {
         destFolder: `${destFolder}/js`,
         outFile: 'libs.js'
+    },
+    styles: {
+        destFolder: `${destFolder}/css`,
+        outFile: 'index.css'
     },
     server: {
         root: destFolder,
