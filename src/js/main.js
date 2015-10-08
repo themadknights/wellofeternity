@@ -1,7 +1,3 @@
-import { Dummy } from './dummy';
+import { Game } from './game';
 
-let reik = new Dummy('reik');
-let last = new Dummy('last');
-
-reik.talk();
-last.talk();
+new Game();

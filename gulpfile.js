@@ -9,6 +9,13 @@ gulp.task('templates', function () {
         .pipe($.connect.reload());
 });
 
+gulp.task('libs', function () {
+    gulp.src(config.files.libs)
+        .pipe($.concat(config.libs.outFile))
+        .pipe(gulp.dest(config.libs.destFolder))
+        .pipe($.connect.reload());
+});
+
 gulp.task('scripts', function () {
     gulp.src(config.files.scripts)
         .pipe($.babel({
@@ -20,7 +27,7 @@ gulp.task('scripts', function () {
         .pipe($.connect.reload());
 });
 
-gulp.task('build', ['scripts', 'templates']);
+gulp.task('build', ['scripts', 'libs', 'templates']);
 
 gulp.task('watch', ['build'], function () {
     gulp.watch(config.files.scripts, ['scripts']);
