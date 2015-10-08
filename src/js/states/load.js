@@ -4,7 +4,8 @@ export class LoadState extends Phaser.State {
     }
 
     preload() {
-        
+        this.game.load.image('background', '/images/sky.png');
+        this.game.load.image('player', '/images/player.png');
     }
 
     create () {

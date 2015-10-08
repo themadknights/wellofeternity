@@ -3,6 +3,12 @@ var gulp   = require('gulp'),
     env    = process.env.NODE_ENV || 'development',
     config = require('./config/gulp.config');
 
+gulp.task('images', function () {
+    gulp.src(config.files.images)
+        .pipe(gulp.dest(config.images.destFolder))
+        .pipe($.connect.reload());
+});
+
 gulp.task('styles', function () {
     gulp.src(config.files.styles)
         .pipe($.concat(config.styles.outFile))
@@ -35,12 +41,13 @@ gulp.task('scripts', function () {
         .pipe($.connect.reload());
 });
 
-gulp.task('build', ['scripts', 'libs', 'templates', 'styles']);
+gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images']);
 
 gulp.task('watch', ['build'], function () {
     gulp.watch(config.files.scripts, ['scripts']);
     gulp.watch(config.files.templates, ['templates']);
     gulp.watch(config.files.styles, ['styles']);
+    gulp.watch(config.files.images, ['images']);
 });
 
 gulp.task('server', ['build'], function() {

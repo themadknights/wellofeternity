@@ -8,6 +8,7 @@ module.exports = {
     },
     files: {
         scripts: [
+            `${sourceFolder}/js/sprites/*.js`,
             `${sourceFolder}/js/states/*.js`,
             `${sourceFolder}/js/**/*.js`
         ],
@@ -15,7 +16,8 @@ module.exports = {
         libs: [
             './node_modules/phaser/dist/phaser.min.js'
         ],
-        styles: `${sourceFolder}/styles/**/*.css`
+        styles: `${sourceFolder}/styles/**/*.css`,
+        images: `${sourceFolder}/images/**/*.*`
     },
     scripts: {
         destFolder: `${destFolder}/js`,
@@ -28,6 +30,9 @@ module.exports = {
     styles: {
         destFolder: `${destFolder}/css`,
         outFile: 'index.css'
+    },
+    images: {
+        destFolder: `${destFolder}/images`
     },
     server: {
         root: destFolder,
