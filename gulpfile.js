@@ -5,12 +5,14 @@ var gulp   = require('gulp'),
 
 gulp.task('images', function () {
     gulp.src(config.files.images)
+        .pipe($.plumber())
         .pipe(gulp.dest(config.images.destFolder))
         .pipe($.connect.reload());
 });
 
 gulp.task('styles', function () {
     gulp.src(config.files.styles)
+        .pipe($.plumber())
         .pipe($.concat(config.styles.outFile))
         .pipe($.if(env === 'production', $.minifyCss()))
         .pipe(gulp.dest(config.styles.destFolder))
@@ -19,12 +21,14 @@ gulp.task('styles', function () {
 
 gulp.task('templates', function () {
     gulp.src(config.files.templates)
+        .pipe($.plumber())
         .pipe(gulp.dest(config.folders.dest))
         .pipe($.connect.reload());
 });
 
 gulp.task('libs', function () {
     gulp.src(config.files.libs)
+        .pipe($.plumber())
         .pipe($.concat(config.libs.outFile))
         .pipe(gulp.dest(config.libs.destFolder))
         .pipe($.connect.reload());
@@ -32,6 +36,7 @@ gulp.task('libs', function () {
 
 gulp.task('scripts', function () {
     gulp.src(config.files.scripts)
+        .pipe($.plumber())
         .pipe($.babel({
             modules: 'umd'
         }))
