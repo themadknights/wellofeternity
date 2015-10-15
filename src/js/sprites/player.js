@@ -1,5 +1,6 @@
 const PLAYER_MAX_HEALTH = 3;
-const PLAYER_FALL_SPEED_LIMIT = 50;
+const PLAYER_FALL_SPEED_LIMIT = 1000;
+const PLAYER_VELOCITY = 300;
 
 export class Player extends Phaser.Sprite {
 
@@ -14,6 +15,14 @@ export class Player extends Phaser.Sprite {
     }
 
     update() {
+        this.body.velocity.x = 0;
+        if(this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+            this.body.velocity.x -= PLAYER_VELOCITY;
+        }
+        if(this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+            this.body.velocity.x += PLAYER_VELOCITY;
+        }
+
         if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
             this.tooFast = true;
         }
