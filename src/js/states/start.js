@@ -5,17 +5,20 @@ export class StartState extends Phaser.State {
         super();
     }
 
+    init() {
+        //Starting Physics
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        //Starting Gamepad Support
+        this.input.gamepad.start();
+    }
+
     create() {
         var i;
 
         this.background = this.game.add.image(0, 0, 'background');
 
         //Creating gravity
-        this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.arcade.gravity.y = 300;
-
-        //Starting gamepad support
-        this.input.gamepad.start();
 
         //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);

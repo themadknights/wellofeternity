@@ -19,29 +19,26 @@ export class Player extends Phaser.Sprite {
     }
 
     update() {
-        //Checking Keyboard Input
+        //Checking Input
         this.body.velocity.x = 0;
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+        if(this.isMovingLeft()) {
             this.body.velocity.x -= PLAYER_VELOCITY;
         }
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+        if(this.isMovingRight()) {
             this.body.velocity.x += PLAYER_VELOCITY;
         }
-
-        //Checking Gamepad Input
-        if(this.pad) {
-            if(this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-                this.body.velocity.x = PLAYER_VELOCITY;
-            } else if(this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-                this.body.velocity.x = -PLAYER_VELOCITY;
-            }
-        }
-
-        //TODO: Checking Mobile Input
 
         if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
             this.tooFast = true;
         }
+    }
+
+    isMovingLeft() {
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.A) || this.pad & (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1);
+    }
+
+    isMovingRight() {
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || (this.pad & this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
     }
 
     loseHealth(health) {
