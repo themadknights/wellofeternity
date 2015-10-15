@@ -1,4 +1,4 @@
-import { Player, PLAYER_FALL_SPEED_LIMIT } from './sprites/player';
+import { Player, PLAYER_MAX_HEALTH } from './sprites/player';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -16,8 +16,6 @@ export class StartState extends Phaser.State {
 
         //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
-        this.physics.arcade.enable(this.player);
-        this.camera.follow(this.player);
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
@@ -33,13 +31,12 @@ export class StartState extends Phaser.State {
     }
 
     update() {
-        if(this.player.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
-            this.player.tooFast = true;
-        }
+
+        this.player.update();
 
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
             if(player.tooFast) {
-                player.loseHealth(3);
+                player.loseHealth(PLAYER_MAX_HEALTH);
             }
         });
     }
