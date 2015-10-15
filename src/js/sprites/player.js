@@ -12,9 +12,14 @@ export class Player extends Phaser.Sprite {
         this.game.camera.follow(this);
         this.health = PLAYER_MAX_HEALTH;
         this.tooFast = false;
+        //Adding gamepad controller
+        if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
+            this.pad = this.game.input.gamepad.pad1;
+        }
     }
 
     update() {
+        //Checking Keyboard Input
         this.body.velocity.x = 0;
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
             this.body.velocity.x -= PLAYER_VELOCITY;
@@ -22,6 +27,17 @@ export class Player extends Phaser.Sprite {
         if(this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
             this.body.velocity.x += PLAYER_VELOCITY;
         }
+
+        //Checking Gamepad Input
+        if(this.pad) {
+            if(this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
+                this.body.velocity.x = PLAYER_VELOCITY;
+            } else if(this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
+                this.body.velocity.x = -PLAYER_VELOCITY;
+            }
+        }
+
+        //TODO: Checking Mobile Input
 
         if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
             this.tooFast = true;
