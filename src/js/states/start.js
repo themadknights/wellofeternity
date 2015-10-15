@@ -1,4 +1,4 @@
-import { Player } from './sprites/player';
+import { Player, PLAYER_FALL_SPEED_LIMIT } from './sprites/player';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -33,10 +33,8 @@ export class StartState extends Phaser.State {
     }
 
     update() {
-        if(this.player.body.velocity.y > this.player.FALL_SPEED_LIMIT) {
+        if(this.player.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
             this.player.tooFast = true;
-        } else {
-            this.player.tooFast = false;
         }
 
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
