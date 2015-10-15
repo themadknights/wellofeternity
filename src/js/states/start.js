@@ -7,8 +7,16 @@ export class StartState extends Phaser.State {
 
     create() {
         var i;
+
         this.background = this.game.add.image(0, 0, 'background');
+
+        //Creating gravity
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        this.physics.arcade.gravity.y = 300;
+
+        //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
+        this.physics.arcade.enable(this.player);
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
