@@ -38,7 +38,7 @@ export class Player extends Phaser.Sprite {
     }
 
     isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || (this.pad & this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || this.pad & (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
     }
 
     loseHealth(health) {
