@@ -1,4 +1,4 @@
-import { Player, PLAYER_MAX_HEALTH } from './sprites/player';
+import { Player } from './sprites/player';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -31,12 +31,9 @@ export class StartState extends Phaser.State {
     }
 
     update() {
-
-        this.player.update();
-
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
             if(player.tooFast) {
-                player.loseHealth(PLAYER_MAX_HEALTH);
+                player.loseAllHealth();
             }
         });
     }

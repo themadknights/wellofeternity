@@ -1,4 +1,4 @@
-export const PLAYER_MAX_HEALTH = 3;
+const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 50;
 
 export class Player extends Phaser.Sprite {
@@ -21,5 +21,9 @@ export class Player extends Phaser.Sprite {
 
     loseHealth(health) {
         this.health -= health;
+    }
+
+    loseAllHealth() {
+        this.health = 0;
     }
 }
