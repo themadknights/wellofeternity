@@ -1,4 +1,5 @@
 import { Player } from './sprites/player';
+import { Enemy } from './sprites/enemy';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -22,6 +23,9 @@ export class StartState extends Phaser.State {
 
         //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
+
+        //Enemy
+        this.enemy = new Enemy(this.game, 100, 200);
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
