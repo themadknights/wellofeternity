@@ -8,8 +8,15 @@ export class Enemy extends Phaser.Sprite {
         // Disable gravity because it's flying
         this.body.allowGravity = false;
 
-        // Create a patrol behavior with a simple yoyo tween
-        this.movementTween = this.game.add.tween(this).to({ x: "+200" }, 800, "Linear", true, 0, -1);
+        // Start patrol behavior by default
+        // TODO: using constants or as a difficulty params
+        this.startPatrolBehavior(200, 800);
+    }
+
+    // Patrols between current position covering a distance (px) in time (ms)
+    startPatrolBehavior(distance, time) {
+        // Create a patrol behavior using a simple yoyo tween
+        this.movementTween = this.game.add.tween(this).to({ x: distance }, time, "Linear", true, 0, -1);
         this.movementTween.yoyo(true, 0);
     }
 }
