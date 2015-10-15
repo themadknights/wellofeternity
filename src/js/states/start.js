@@ -24,8 +24,9 @@ export class StartState extends Phaser.State {
         //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
 
-        //Enemy
-        this.enemy = new Enemy(this.game, 100, 200);
+        //Enemies group
+        this.enemies = this.game.add.group();
+        this.enemies.add(new Enemy(this.game, 100, 200));
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
@@ -46,5 +47,11 @@ export class StartState extends Phaser.State {
                 player.loseAllHealth();
             }
         });
+
+        this.physics.arcade.collide(this.player, this.enemies, function(player) {
+            player.loseAllHealth(); // TODO: don't kill player just reduce its health
+        });
+
+        //TODO: check game over condition
     }
 }
