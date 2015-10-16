@@ -1,4 +1,5 @@
 import { Player } from './sprites/player';
+import { Enemy } from './sprites/enemy';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -23,6 +24,10 @@ export class StartState extends Phaser.State {
         //Player
         this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
 
+        //Enemies group
+        this.enemies = this.game.add.group();
+        this.enemies.add(new Enemy(this.game, 300, 400));
+
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
@@ -42,5 +47,11 @@ export class StartState extends Phaser.State {
                 player.loseAllHealth();
             }
         });
+
+        this.physics.arcade.collide(this.player, this.enemies, function(player, enemy) {
+            player.loseHealth(enemy.damage);
+        });
+
+        //TODO: check game over condition
     }
 }

@@ -34,11 +34,11 @@ export class Player extends Phaser.Sprite {
     }
 
     isMovingLeft() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.A) || this.pad & (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
     }
 
     isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || this.pad & (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1);
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1);
     }
 
     loseHealth(health) {

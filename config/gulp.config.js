@@ -1,5 +1,5 @@
-var sourceFolder = './src',
-    destFolder   = './public';
+var sourceFolder = 'src',
+    destFolder   = 'public';
 
 module.exports = {
     folders: {
@@ -14,7 +14,7 @@ module.exports = {
         ],
         templates: `${sourceFolder}/templates/**/*.html`,
         libs: [
-            './node_modules/phaser/dist/phaser.min.js'
+            'node_modules/phaser/dist/phaser.min.js'
         ],
         styles: `${sourceFolder}/styles/**/*.css`,
         images: `${sourceFolder}/images/**/*.*`
