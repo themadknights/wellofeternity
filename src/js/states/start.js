@@ -41,9 +41,10 @@ export class StartState extends Phaser.State {
             this.map.putTile(0, 10+i, 16);
         }
 
+        //Spikes logic (Tiles: 1)
         this.map.setTileIndexCallback(1, function(player) {
             //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-            if(player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
+            if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
                 player.loseAllHealth();
                 console.log(player.body.velocity.y);
             }
