@@ -1,6 +1,7 @@
 const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 1000;
 const PLAYER_VELOCITY = 300;
+export const PLAYER_SPIKE_VELOCITY = 50;
 
 export class Player extends Phaser.Sprite {
 
