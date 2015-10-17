@@ -22,7 +22,7 @@ export class StartState extends Phaser.State {
         this.physics.arcade.gravity.y = 300;
 
         //Player
-        this.player = new Player(this.game, this.game.world.centerX, this.game.world.centerY);
+        this.player = new Player(this.game, this.game.world.centerX, 100);
 
         //Enemies group
         this.enemies = this.game.add.group();
@@ -63,9 +63,10 @@ export class StartState extends Phaser.State {
         //The player can walk through spikes
         this.map.putTile(1, 10, 14);
 
-        //Goal logic
+        //Goal logic (Tiles: 2)
         this.map.setTileIndexCallback(2, function() {
             console.log("Player wins");
+            this.state.restart();
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
@@ -86,5 +87,9 @@ export class StartState extends Phaser.State {
         });
 
         //TODO: check game over condition
+    }
+
+    render() {
+        this.game.debug.spriteInfo(this.player, 32, 32);
     }
 }
