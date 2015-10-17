@@ -49,4 +49,8 @@ export class Player extends Phaser.Sprite {
     loseAllHealth() {
         this.health = 0;
     }
+
+    isDead() {
+        return this.health <= 0;
+    }
 }
