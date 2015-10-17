@@ -1,4 +1,4 @@
-import { Player } from './sprites/player';
+import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 
 export class StartState extends Phaser.State {
@@ -38,7 +38,29 @@ export class StartState extends Phaser.State {
         //TODO: Example of platform, to be deleted when the map generation is done
         for(i = 0; i < 15; i++) {
             this.map.putTile(0, 10+i, 15);
+            this.map.putTile(0, 10+i, 16);
         }
+
+        this.map.setTileIndexCallback(1, function(player) {
+            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
+            if(player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
+                player.loseAllHealth();
+                console.log(player.body.velocity.y);
+            }
+        }, this);
+
+        //TODO: Example of spikes, to be deleted when the map generation is done
+        //The player can walk over spikes if they are 2 and he walks quickly
+        this.map.putTile(1, 15, 15);
+        this.map.putTile(1, 16, 15);
+        //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
+        this.map.putTile(1, 18, 15);
+        //The player die
+        this.map.putTile(1, 20, 15);
+        this.map.putTile(1, 21, 15);
+        this.map.putTile(1, 22, 15);
+        //The player can walk through spikes
+        this.map.putTile(1, 10, 14);
     }
 
     update() {
