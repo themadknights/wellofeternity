@@ -57,7 +57,7 @@ export class Player extends Phaser.Sprite {
     isJumping() {
         return this.game.input.keyboard.isDown(Phaser.Keyboard.W) || this.pad &&
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
-        this.game.input.activePointer.positionDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
+        this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
     }
 
     loseHealth(health) {
