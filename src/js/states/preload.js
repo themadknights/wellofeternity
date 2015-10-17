@@ -10,7 +10,7 @@ export class PreloadState extends Phaser.State {
     }
 
     preload() {
-        
+
     }
 
     create () {

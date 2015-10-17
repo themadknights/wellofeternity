@@ -11,7 +11,7 @@ RUN cd && wget https://nodejs.org/dist/v4.1.2/node-v4.1.2.tar.gz && \
     ./configure && make && make install
 
 # Install gulp globally
-RUN npm install -g gulp
+RUN npm install -g gulp surge
 
 # Create working directory
 ENV APP_HOME /wellofeternity
