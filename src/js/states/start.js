@@ -62,6 +62,16 @@ export class StartState extends Phaser.State {
         this.map.putTile(1, 22, 15);
         //The player can walk through spikes
         this.map.putTile(1, 10, 14);
+
+        //Goal logic
+        this.map.setTileIndexCallback(2, function() {
+            console.log("Player wins");
+        }, this);
+
+        //TODO: Example of goal, to be deleted when the map generation si done
+        for(i = 0; i < 25; i++) {
+            this.map.putTile(2, i, 99);
+        }
     }
 
     update() {
