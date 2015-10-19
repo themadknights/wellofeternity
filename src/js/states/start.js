@@ -21,13 +21,16 @@ export class StartState extends Phaser.State {
 
         // Add rope to the back of the scene but in front background
         this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
+        this.game.physics.arcade.enable(this.rope);
         this.rope.anchor.setTo(0.5, 0);
+        this.rope.body.immovable = true;
+        this.rope.body.allowGravity = false;
 
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
         //Player
-        this.player = new Player(this.game, this.game.world.centerX, 100);
+        this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Enemies group
         this.enemies = this.game.add.group();
