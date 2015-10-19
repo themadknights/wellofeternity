@@ -1,5 +1,6 @@
 import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
+import { pad } from './utils';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -74,8 +75,10 @@ export class StartState extends Phaser.State {
             this.map.putTile(2, i, 99);
         }
 
-        // this.game.add.bitmapText(0, 100, 'carrier_command', "Thank you for playing!", 18);
-        // this.game.add.bitmapText(0, 100, 'carrier_command', "Thank you for playing!", 18);
+        this.score = 0;
+        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
+        this.scoreLabel.anchor.setTo(1, 0);
+        this.scoreLabel.fixedToCamera = true;
     }
 
     update() {
@@ -92,6 +95,8 @@ export class StartState extends Phaser.State {
         if (this.player.isDead()) {
             this.restartLevel();
         }
+
+        this.addScore(1);
     }
 
     render() {
@@ -100,5 +105,10 @@ export class StartState extends Phaser.State {
 
     restartLevel() {
         this.state.restart();
+    }
+
+    addScore (amount) {
+        this.score += amount;
+        this.scoreLabel.text = `Score: ${pad(this.score, 8)}`;
     }
 }
