@@ -3,6 +3,13 @@ var gulp   = require('gulp'),
     env    = process.env.NODE_ENV || 'development',
     config = require('./config/gulp.config');
 
+gulp.task('fonts', function () {
+    gulp.src(config.files.fonts)
+        .pipe($.plumber())
+        .pipe(gulp.dest(config.fonts.destFolder))
+        .pipe($.connect.reload());
+});
+
 gulp.task('images', function () {
     gulp.src(config.files.images)
         .pipe($.plumber())
@@ -46,13 +53,14 @@ gulp.task('scripts', function () {
         .pipe($.connect.reload());
 });
 
-gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images']);
+gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images', 'fonts']);
 
 gulp.task('watch', ['build'], function () {
     gulp.watch(config.files.scripts, ['scripts']);
     gulp.watch(config.files.templates, ['templates']);
     gulp.watch(config.files.styles, ['styles']);
     gulp.watch(config.files.images, ['images']);
+    gulp.watch(config.files.fonts, ['fonts']);
 });
 
 gulp.task('server', ['build'], function() {

@@ -92,7 +92,7 @@ export class StartState extends Phaser.State {
     }
 
     render() {
-        this.game.debug.spriteInfo(this.player, 32, 32);
+        // this.game.debug.spriteInfo(this.player, 32, 32);
     }
 
     restartLevel() {

@@ -17,7 +17,8 @@ module.exports = {
             'node_modules/phaser/dist/phaser.min.js'
         ],
         styles: `${sourceFolder}/styles/**/*.css`,
-        images: `${sourceFolder}/images/**/*.*`
+        images: `${sourceFolder}/images/**/*.*`,
+        fonts: `${sourceFolder}/fonts/**/*.*`
     },
     scripts: {
         destFolder: `${destFolder}/js`,
@@ -33,6 +34,9 @@ module.exports = {
     },
     images: {
         destFolder: `${destFolder}/images`
+    },
+    fonts: {
+        destFolder: `${destFolder}/fonts`
     },
     server: {
         root: destFolder,
