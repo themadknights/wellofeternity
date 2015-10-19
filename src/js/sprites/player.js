@@ -13,7 +13,8 @@ export class Player extends Phaser.Sprite {
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
         this.game.camera.follow(this);
-        this.health = PLAYER_MAX_HEALTH;
+        this.maxHealth = PLAYER_MAX_HEALTH;
+        this.health = 1; // TODO: start with less health for testing
         this.tooFast = false;
         //Adding gamepad controller
         if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
