@@ -73,6 +73,9 @@ export class StartState extends Phaser.State {
         for(i = 0; i < 25; i++) {
             this.map.putTile(2, i, 99);
         }
+
+        // this.game.add.bitmapText(0, 100, 'carrier_command', "Thank you for playing!", 18);
+        // this.game.add.bitmapText(0, 100, 'carrier_command', "Thank you for playing!", 18);
     }
 
     update() {
