@@ -1,9 +1,4 @@
-export function pad (number, zeros) {
+export function pad(number, zeros = '00000000') {
     var s = number.toString();
-
-    while (s.length < zeros) {
-        s = "0" + s;
-    }
-
-    return s;
+    return zeros.substring(0, zeros.length - s.length) + s;
 }
