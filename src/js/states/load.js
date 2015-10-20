@@ -8,6 +8,7 @@ export class LoadState extends Phaser.State {
         this.load.image('player', 'images/player.png');
         this.load.image('world', 'images/world.png');
         this.load.image('enemy', 'images/bat.png');
+        this.load.image('rope', 'images/rope.png');
     }
 
     create () {
