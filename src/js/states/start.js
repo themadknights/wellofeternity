@@ -1,5 +1,6 @@
 import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
+import { pad } from './utils';
 
 export class StartState extends Phaser.State {
     constructor() {
@@ -81,6 +82,23 @@ export class StartState extends Phaser.State {
             this.map.putTile(2, i, 99);
         }
 
+        this.score = 0;
+        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
+        this.scoreLabel.anchor.setTo(1, 0);
+        this.scoreLabel.fixedToCamera = true;
+
+
+        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
+        this.healthLabel.fixedToCamera = true;
+
+        this.healthIcons = this.game.add.group();
+        this.healthIcons.fixedToCamera = true;
+        for (i = 0; i < this.player.maxHealth; i += 1) {
+            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
+            icon.anchor.setTo(0.5);
+            this.healthIcons.add(icon);
+        }
+        this.updateHealthHud();
         this.platforms.resizeWorld();
     }
 
@@ -98,13 +116,27 @@ export class StartState extends Phaser.State {
         if (this.player.isDead()) {
             this.restartLevel();
         }
+
+        // TODO: Not a real usage, just for testing
+        this.addScore(1);
     }
 
     render() {
-        this.game.debug.spriteInfo(this.player, 32, 32);
+        // this.game.debug.spriteInfo(this.player, 32, 32);
     }
 
     restartLevel() {
         this.state.restart();
+    }
+
+    addScore (amount) {
+        this.score += amount;
+        this.scoreLabel.text = `Score: ${pad(this.score)}`;
+    }
+
+    updateHealthHud () {
+        for (let i = 0; i < this.player.maxHealth; i += 1) {
+            this.healthIcons.children[i].frame = i < this.player.health ? 0 : 1;
+        }
     }
 }
