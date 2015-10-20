@@ -2,6 +2,8 @@ import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
 
+const SCORE_PADDING = 8;
+
 export class StartState extends Phaser.State {
     constructor() {
         super();
@@ -109,6 +111,7 @@ export class StartState extends Phaser.State {
             this.restartLevel();
         }
 
+        // TODO: Not a real usage, just for testing
         this.addScore(1);
     }
 
@@ -122,7 +125,7 @@ export class StartState extends Phaser.State {
 
     addScore (amount) {
         this.score += amount;
-        this.scoreLabel.text = `Score: ${pad(this.score, 8)}`;
+        this.scoreLabel.text = `Score: ${pad(this.score, SCORE_PADDING)}`;
     }
 
     updateHealthHud () {
