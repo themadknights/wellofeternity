@@ -17,13 +17,21 @@ export class StartState extends Phaser.State {
     create() {
         var i;
 
-        this.background = this.game.add.image(0, 0, 'background');
+        // Add simple background as tile sprite
+        this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
+
+        // Add rope to the back of the scene but in front background
+        this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
+        this.game.physics.arcade.enable(this.rope);
+        this.rope.anchor.setTo(0.5, 0);
+        this.rope.body.immovable = true;
+        this.rope.body.allowGravity = false;
 
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
         //Player
-        this.player = new Player(this.game, this.game.world.centerX, 100);
+        this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Enemies group
         this.enemies = this.game.add.group();
@@ -33,7 +41,6 @@ export class StartState extends Phaser.State {
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 25, 100, 32, 32);
-        this.platforms.resizeWorld();
         this.map.setCollision(0);
 
         //TODO: Example of platform, to be deleted when the map generation is done
@@ -92,6 +99,7 @@ export class StartState extends Phaser.State {
             this.healthIcons.add(icon);
         }
         this.updateHealthHud();
+        this.platforms.resizeWorld();
     }
 
     update() {

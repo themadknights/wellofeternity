@@ -7,8 +7,9 @@ export const PLAYER_SPIKE_VELOCITY = 50;
 
 export class Player extends Phaser.Sprite {
 
-    constructor(game, x, y) {
+    constructor(game, state, x, y) {
         super(game, x, y, 'player');
+        this.state = state;
         this.anchor.setTo(0.5);
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
@@ -25,6 +26,7 @@ export class Player extends Phaser.Sprite {
     update() {
         //Checking Input
         this.body.velocity.x = 0;
+
         if(this.isMovingLeft()) {
             this.body.velocity.x -= PLAYER_VELOCITY;
         }
@@ -39,6 +41,14 @@ export class Player extends Phaser.Sprite {
         if (this.canJump() && this.isJumping()) {
             this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
         }
+
+        this.body.allowGravity = true;
+        // player.body.velocity.y = 0;
+        this.state.physics.arcade.overlap(this, this.state.rope, function(player) {
+            if (player.isGrabbingTheRope()) {
+                player.disableGravity();
+            }
+        });
     }
 
     isMovingLeft() {
@@ -61,6 +71,12 @@ export class Player extends Phaser.Sprite {
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
     }
 
+    isGrabbingTheRope() {
+        return this.game.input.keyboard.isDown(Phaser.Keyboard.W) || this.pad &&
+        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
+        this.game.input.activePointer.isDown;
+    }
+
     loseHealth(health) {
         this.health -= health;
     }
@@ -71,5 +87,10 @@ export class Player extends Phaser.Sprite {
 
     isDead() {
         return this.health <= 0;
+    }
+
+    disableGravity () {
+        this.body.allowGravity = false;
+        this.body.velocity.y = 0;
     }
 }
