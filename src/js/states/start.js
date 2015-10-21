@@ -1,3 +1,4 @@
+import { Chest } from './sprite/chest';
 import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
@@ -36,6 +37,10 @@ export class StartState extends Phaser.State {
         //Enemies group
         this.enemies = this.game.add.group();
         this.enemies.add(new Enemy(this.game, 200, 600));
+
+        //Chest group
+        this.chests = this.game.add.group();
+        this.chests.add(new Chest(this.game, 768, 468));
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
