@@ -29,9 +29,11 @@ export class Player extends Phaser.Sprite {
 
         if(this.isMovingLeft()) {
             this.body.velocity.x -= PLAYER_VELOCITY;
+            this.scale.setTo(-1, 1);
         }
         if(this.isMovingRight()) {
             this.body.velocity.x += PLAYER_VELOCITY;
+            this.scale.setTo(1, 1);
         }
 
         if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
