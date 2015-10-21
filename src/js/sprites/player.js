@@ -21,6 +21,7 @@ export class Player extends Phaser.Sprite {
         if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
             this.pad = this.game.input.gamepad.pad1;
         }
+        this.allowJump = true;
     }
 
     update() {
@@ -29,9 +30,11 @@ export class Player extends Phaser.Sprite {
 
         if(this.isMovingLeft()) {
             this.body.velocity.x -= PLAYER_VELOCITY;
+            this.scale.setTo(-1, 1);
         }
         if(this.isMovingRight()) {
             this.body.velocity.x += PLAYER_VELOCITY;
+            this.scale.setTo(1, 1);
         }
 
         if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
@@ -49,6 +52,18 @@ export class Player extends Phaser.Sprite {
                 player.disableGravity();
             }
         });
+
+        this.state.physics.arcade.overlap(this, this.state.chests, function(player, chest) {
+            if(!chest.open) {
+                player.allowJump = false;
+                chest.open = true;
+                let timer = this.game.time.create(this.game , true);
+                timer.add(0.5*Phaser.Timer.SECOND, function() {
+                    player.allowJump = true;
+                }, this);
+                timer.start();
+            }
+        }, null, this);
     }
 
     isMovingLeft() {
@@ -62,7 +77,7 @@ export class Player extends Phaser.Sprite {
     }
 
     canJump() {
-        return this.body.blocked.down;
+        return this.body.blocked.down && this.allowJump;
     }
 
     isJumping() {

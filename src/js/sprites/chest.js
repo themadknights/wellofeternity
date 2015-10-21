@@ -4,7 +4,7 @@ export class Chest extends Phaser.Sprite {
         this.anchor.setTo(0.5);
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
-
+        this.open = false;
         this.body.allowGravity = false;
     }
 
