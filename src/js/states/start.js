@@ -31,16 +31,16 @@ export class StartState extends Phaser.State {
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 25, 100, 32, 32);
-        this.map.setCollision(0);
+        this.map.setCollisionBetween(0, 5);
 
         //TODO: Example of platform, to be deleted when the map generation is done
         for(i = 0; i < 15; i++) {
-            this.map.putTile(0, 10+i, 15);
-            this.map.putTile(0, 10+i, 16);
+            this.map.putTile(i%6, 10+i, 15);
+            this.map.putTile(i%6+6, 10+i, 16);
         }
 
-        //Spikes logic (Tiles: 1)
-        this.map.setTileIndexCallback(1, function(player) {
+        //Spikes logic (Tiles: 99)
+        this.map.setTileIndexCallback(99, function(player) {
             //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
             if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
                 player.loseAllHealth();
@@ -50,26 +50,28 @@ export class StartState extends Phaser.State {
 
         //TODO: Example of spikes, to be deleted when the map generation is done
         //The player can walk over spikes if they are 2 and he walks quickly
-        this.map.putTile(1, 15, 15);
-        this.map.putTile(1, 16, 15);
+        this.map.putTile(12, 15, 15);
+        this.map.putTile(12, 16, 15);
         //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
-        this.map.putTile(1, 18, 15);
+        this.map.putTile(12, 18, 15);
         //The player die
-        this.map.putTile(1, 20, 15);
-        this.map.putTile(1, 21, 15);
-        this.map.putTile(1, 22, 15);
+        this.map.putTile(12, 20, 15);
+        this.map.putTile(12, 21, 15);
+        this.map.putTile(12, 22, 15);
         //The player can walk through spikes
-        this.map.putTile(1, 10, 14);
+        this.map.putTile(12, 10, 14);
+        //Replace 12 index for 12..15 randomly
+        this.replaceRandomSpikes();
 
-        //Goal logic (Tiles: 2)
-        this.map.setTileIndexCallback(2, function() {
+        //Goal logic (Tiles: 98)
+        this.map.setTileIndexCallback(98, function() {
             // TODO: restart the level for now, same as player's death
             this.restartLevel();
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
         for(i = 0; i < 25; i++) {
-            this.map.putTile(2, i, 99);
+            this.map.putTile(98, i, 99);
         }
 
         // HUD
@@ -171,5 +173,13 @@ export class StartState extends Phaser.State {
         rightWall.anchor.setTo(1, 0);
         rightWall.body.immovable = true;
         rightWall.body.allowGravity = false;
+    }
+
+    replaceRandomSpikes () {
+        this.map.forEach(function (tile) {
+            if (tile.index === 12) {
+                tile.index = this.game.rnd.integerInRange(12, 15);
+            }
+        }, this);
     }
 }
