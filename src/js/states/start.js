@@ -82,11 +82,14 @@ export class StartState extends Phaser.State {
             this.map.putTile(2, i, 99);
         }
 
+        // Add walls
+        this.createWalls();
+
+        // HUD
         this.score = 0;
         this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
         this.scoreLabel.anchor.setTo(1, 0);
         this.scoreLabel.fixedToCamera = true;
-
 
         this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
         this.healthLabel.fixedToCamera = true;
@@ -103,6 +106,8 @@ export class StartState extends Phaser.State {
     }
 
     update() {
+        this.physics.arcade.collide(this.player, this.walls);
+
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
             if(player.tooFast) {
                 player.loseAllHealth();
@@ -138,5 +143,22 @@ export class StartState extends Phaser.State {
         for (let i = 0; i < this.player.maxHealth; i += 1) {
             this.healthIcons.children[i].frame = i < this.player.health ? 0 : 1;
         }
+    }
+
+    createWalls () {
+        let leftWall = this.game.add.tileSprite(0, 0, 16, this.game.world.height, 'wall');
+        let rightWall = this.game.add.tileSprite(this.game.world.width, 0, 16, this.game.world.height, 'wall');
+
+        this.walls = this.game.add.group();
+        this.walls.enableBody = true; // Enable physics for the whole group
+        this.walls.add(leftWall);
+        this.walls.add(rightWall);
+
+        leftWall.body.immovable = true;
+        leftWall.body.allowGravity = false;
+
+        rightWall.anchor.setTo(1, 0);
+        rightWall.body.immovable = true;
+        rightWall.body.allowGravity = false;
     }
 }
