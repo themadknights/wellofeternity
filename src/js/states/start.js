@@ -17,16 +17,6 @@ export class StartState extends Phaser.State {
     create() {
         var i;
 
-        // Add simple background as tile sprite
-        this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
-
-        // Add rope to the back of the scene but in front background
-        this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
-        this.game.physics.arcade.enable(this.rope);
-        this.rope.anchor.setTo(0.5, 0);
-        this.rope.body.immovable = true;
-        this.rope.body.allowGravity = false;
-
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
@@ -82,9 +72,6 @@ export class StartState extends Phaser.State {
             this.map.putTile(2, i, 99);
         }
 
-        // Add walls
-        this.createWalls();
-
         // HUD
         this.score = 0;
         this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
@@ -102,7 +89,17 @@ export class StartState extends Phaser.State {
             this.healthIcons.add(icon);
         }
         this.updateHealthHud();
+
         this.platforms.resizeWorld();
+
+        // Add walls
+        this.createWalls();
+
+        // Add rope to the back of the scene but in front background
+        this.createRope();
+
+        // Add simple background as tile sprite
+        this.createBackground();
     }
 
     update() {
@@ -143,6 +140,20 @@ export class StartState extends Phaser.State {
         for (let i = 0; i < this.player.maxHealth; i += 1) {
             this.healthIcons.children[i].frame = i < this.player.health ? 0 : 1;
         }
+    }
+
+    createBackground () {
+        this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
+        this.background.sendToBack();
+    }
+
+    createRope () {
+        this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
+        this.game.physics.arcade.enable(this.rope);
+        this.rope.anchor.setTo(0.5, 0);
+        this.rope.body.immovable = true;
+        this.rope.body.allowGravity = false;
+        this.rope.sendToBack();
     }
 
     createWalls () {
