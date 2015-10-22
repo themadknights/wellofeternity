@@ -59,16 +59,18 @@ export class StartState extends Phaser.State {
 
         //TODO: Example of spikes, to be deleted when the map generation is done
         //The player can walk over spikes if they are 2 and he walks quickly
-        this.map.putTile(99, 15, 15);
-        this.map.putTile(99, 16, 15);
+        this.map.putTile(12, 15, 15);
+        this.map.putTile(12, 16, 15);
         //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
-        this.map.putTile(99, 18, 15);
+        this.map.putTile(12, 18, 15);
         //The player die
-        this.map.putTile(99, 20, 15);
-        this.map.putTile(99, 21, 15);
-        this.map.putTile(99, 22, 15);
+        this.map.putTile(12, 20, 15);
+        this.map.putTile(12, 21, 15);
+        this.map.putTile(12, 22, 15);
         //The player can walk through spikes
-        this.map.putTile(99, 10, 14);
+        this.map.putTile(12, 10, 14);
+        //Replace 12 index for 12..15 randomly
+        this.replaceRandomSpikes();
 
         //Goal logic (Tiles: 98)
         this.map.setTileIndexCallback(98, function(player) {
@@ -191,5 +193,13 @@ export class StartState extends Phaser.State {
         rightWall.anchor.setTo(1, 0);
         rightWall.body.immovable = true;
         rightWall.body.allowGravity = false;
+    }
+
+    replaceRandomSpikes () {
+        this.map.forEach(function (tile) {
+            if (tile.index === 12) {
+                tile.index = this.game.rnd.integerInRange(12, 15);
+            }
+        }, this);
     }
 }
