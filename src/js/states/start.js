@@ -71,9 +71,11 @@ export class StartState extends Phaser.State {
         this.map.putTile(99, 10, 14);
 
         //Goal logic (Tiles: 98)
-        this.map.setTileIndexCallback(98, function() {
+        this.map.setTileIndexCallback(98, function(player) {
             // TODO: restart the level for now, same as player's death
-            this.restartLevel();
+            if(player === this.player) {
+                this.restartLevel();
+            }
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
@@ -123,6 +125,13 @@ export class StartState extends Phaser.State {
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
             player.loseHealth(enemy.damage);
         });
+
+        this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
+            if(coin.allowedPickup) {
+                coin.kill();
+                this.addScore(100);
+            }
+        }, null, this);
 
         this.physics.arcade.collide(this.coins, this.platforms);
 

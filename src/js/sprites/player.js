@@ -68,14 +68,21 @@ export class Player extends Phaser.Sprite {
                         } else {
                             coin = this.state.coins.create(chest.x, chest.y, 'coin');
                             coin.anchor.setTo(0.5);
-                            coin.body.bounce.set(0.9);
                         }
+                        coin.allowedPickup = false;
+                        let coinTimer = this.game.time.create(this.game, true);
+                        coinTimer.add(1*Phaser.Timer.SECOND, function() {
+                            coin.allowedPickup = true;
+                        }, this);
+                        coinTimer.start();
+                        coin.body.bounce.set(0.9);
                         coin.body.velocity.x = this.game.rnd.between(-100, 100);
                         coin.body.velocity.y = this.game.rnd.between(-200, -50);
                     }
-                    let timer = this.game.time.create(this.game , true);
+                    let timer = this.game.time.create(this.game, true);
                     timer.add(0.5*Phaser.Timer.SECOND, function() {
                         player.allowJump = true;
+                        chest.open = false;
                     }, this);
                     timer.start();
                 }
