@@ -1,3 +1,4 @@
+import { Chest } from './sprite/chest';
 import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
@@ -20,12 +21,20 @@ export class StartState extends Phaser.State {
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
-        //Player
-        this.player = new Player(this.game, this, this.game.world.centerX, 100);
-
         //Enemies group
         this.enemies = this.game.add.group();
         this.enemies.add(new Enemy(this.game, 200, 600));
+
+        //Chest group
+        this.chests = this.game.add.group();
+        this.chests.add(new Chest(this.game, 448, 468));
+
+        //Coins group
+        this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.coins.enableBody = true;
+
+        //Player
+        this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.map = this.add.tilemap();
@@ -64,9 +73,11 @@ export class StartState extends Phaser.State {
         this.replaceRandomSpikes();
 
         //Goal logic (Tiles: 98)
-        this.map.setTileIndexCallback(98, function() {
+        this.map.setTileIndexCallback(98, function(player) {
             // TODO: restart the level for now, same as player's death
-            this.restartLevel();
+            if(player === this.player) {
+                this.restartLevel();
+            }
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
@@ -116,6 +127,15 @@ export class StartState extends Phaser.State {
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
             player.loseHealth(enemy.damage);
         });
+
+        this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
+            if(coin.allowedPickup) {
+                coin.kill();
+                this.addScore(100);
+            }
+        }, null, this);
+
+        this.physics.arcade.collide(this.coins, this.platforms);
 
         if (this.player.isDead()) {
             this.restartLevel();

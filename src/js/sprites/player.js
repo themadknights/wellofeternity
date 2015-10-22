@@ -21,6 +21,7 @@ export class Player extends Phaser.Sprite {
         if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
             this.pad = this.game.input.gamepad.pad1;
         }
+        this.allowJump = true;
     }
 
     update() {
@@ -51,6 +52,42 @@ export class Player extends Phaser.Sprite {
                 player.disableGravity();
             }
         });
+
+        this.state.physics.arcade.overlap(this, this.state.chests, function(player, chest) {
+            if(!chest.open) {
+                //Opening the chest and cancel player jump
+                player.allowJump = false;
+                if(player.isGrabbingTheRope()) {
+                    chest.open = true;
+                    //Spawning coins
+                    let n = this.game.rnd.integerInRange(1, 5);
+                    for(let i = 0; i < n; i++) {
+                        let coin = this.state.coins.getFirstExists(false);
+                        if(coin) {
+                            coin.reset(chest.x, chest.y);
+                        } else {
+                            coin = this.state.coins.create(chest.x, chest.y, 'coin');
+                            coin.anchor.setTo(0.5);
+                        }
+                        coin.allowedPickup = false;
+                        let coinTimer = this.game.time.create(this.game, true);
+                        coinTimer.add(1*Phaser.Timer.SECOND, function() {
+                            coin.allowedPickup = true;
+                        }, this);
+                        coinTimer.start();
+                        coin.body.bounce.set(0.9);
+                        coin.body.velocity.x = this.game.rnd.between(-100, 100);
+                        coin.body.velocity.y = this.game.rnd.between(-200, -50);
+                    }
+                    let timer = this.game.time.create(this.game, true);
+                    timer.add(0.5*Phaser.Timer.SECOND, function() {
+                        player.allowJump = true;
+                        chest.open = false;
+                    }, this);
+                    timer.start();
+                }
+            }
+        }, null, this);
     }
 
     isMovingLeft() {
@@ -64,7 +101,7 @@ export class Player extends Phaser.Sprite {
     }
 
     canJump() {
-        return this.body.blocked.down;
+        return this.body.blocked.down && this.allowJump;
     }
 
     isJumping() {
