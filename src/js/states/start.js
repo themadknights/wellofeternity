@@ -138,19 +138,16 @@ export class StartState extends Phaser.State {
         this.physics.arcade.collide(this.coins, this.platforms);
 
         if (this.player.isDead()) {
-            this.restartLevel();
+            this.gameOver();
         }
-
-        // TODO: Not a real usage, just for testing
-        this.addScore(1);
     }
 
     render() {
         // this.game.debug.spriteInfo(this.player, 32, 32);
     }
 
-    restartLevel() {
-        this.state.restart();
+    gameOver() {
+        this.game.state.start('gameover');
     }
 
     addScore (amount) {
