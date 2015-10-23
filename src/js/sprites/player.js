@@ -130,7 +130,9 @@ export class Player extends Phaser.Sprite {
     }
 
     loseAllHealth() {
-        this.health = 0;
+        if(!this.immune) {
+            this.health = 0;
+        }
     }
 
     isDead() {
