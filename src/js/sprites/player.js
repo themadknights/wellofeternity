@@ -22,6 +22,7 @@ export class Player extends Phaser.Sprite {
             this.pad = this.game.input.gamepad.pad1;
         }
         this.allowJump = true;
+        this.immune = false;
     }
 
     update() {
@@ -116,7 +117,17 @@ export class Player extends Phaser.Sprite {
     }
 
     loseHealth(health) {
-        this.health -= health;
+        console.log(this.immune);
+        if(!this.immune) {
+            this.health -= health;
+            this.immune = true;
+            let timer = this.game.time.create(this.game, true);
+            timer.add(2*Phaser.Timer.SECOND, function() {
+                console.log("immune");
+                this.immune = false;
+            }, this);
+            timer.start();
+        }
     }
 
     loseAllHealth() {
