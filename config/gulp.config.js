@@ -19,6 +19,7 @@ module.exports = {
         ],
         styles: `${sourceFolder}/styles/**/*.css`,
         images: `${sourceFolder}/images/**/*.*`,
+        json: `${sourceFolder}/json/**/*.*`,
         fonts: `${sourceFolder}/fonts/**/*.*`
     },
     scripts: {
@@ -35,6 +36,9 @@ module.exports = {
     },
     images: {
         destFolder: `${destFolder}/images`
+    },
+    json: {
+        destFolder: `${destFolder}/json`
     },
     fonts: {
         destFolder: `${destFolder}/fonts`

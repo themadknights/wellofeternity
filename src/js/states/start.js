@@ -37,11 +37,12 @@ export class StartState extends Phaser.State {
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Creating the map and its main layer, resizering the world to fix that layer
+        this.mapPresets = this.game.cache.getJSON('presets');
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 25, 100, 32, 32);
+        this.generateWorldChunk(20);
         this.map.setCollisionBetween(0, 5);
-
         //TODO: Example of platform, to be deleted when the map generation is done
         for(i = 0; i < 15; i++) {
             this.map.putTile(i%6, 10+i, 15);
@@ -110,8 +111,7 @@ export class StartState extends Phaser.State {
 
         // Add rope to the back of the scene but in front background
         this.createRope();
-
-        // Add simple background as tile sprite
+         // Add simple background as tile sprite
         this.createBackground();
     }
 
@@ -201,5 +201,13 @@ export class StartState extends Phaser.State {
                 tile.index = this.game.rnd.integerInRange(12, 15);
             }
         }, this);
+    }
+
+    generateWorldChunk(y) {
+        var mapChunk = this.mapPresets.data[this.game.rnd.integerInRange(0,2)];
+        var i = 0;
+        this.map.forEach(function(tile) {
+            tile.index = mapChunk[i++] - 1;
+        }, this, 0, y, 25, 20);
     }
 }
