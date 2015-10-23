@@ -104,6 +104,7 @@ export class StartState extends Phaser.State {
         }
         this.updateHealthHud();
 
+        // Add simple background as tile sprite
         this.platforms.resizeWorld();
 
         // Add walls
