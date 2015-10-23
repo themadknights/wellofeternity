@@ -104,7 +104,6 @@ export class StartState extends Phaser.State {
         }
         this.updateHealthHud();
 
-        // Add simple background as tile sprite
         this.platforms.resizeWorld();
 
         // Add walls
@@ -112,6 +111,7 @@ export class StartState extends Phaser.State {
 
         // Add rope to the back of the scene but in front background
         this.createRope();
+         // Add simple background as tile sprite
         this.createBackground();
     }
 
