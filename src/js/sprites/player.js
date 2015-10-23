@@ -82,7 +82,6 @@ export class Player extends Phaser.Sprite {
                     let timer = this.game.time.create(this.game, true);
                     timer.add(0.5*Phaser.Timer.SECOND, function() {
                         player.allowJump = true;
-                        chest.open = false;
                     }, this);
                     timer.start();
                 }
