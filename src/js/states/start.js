@@ -77,7 +77,7 @@ export class StartState extends Phaser.State {
         this.map.setTileIndexCallback(98, function(player) {
             // TODO: restart the level for now, same as player's death
             if(player === this.player) {
-                this.restartLevel();
+                this.gameOver();
             }
         }, this);
 
