@@ -15,13 +15,14 @@ export class Player extends Phaser.Sprite {
         this.game.physics.arcade.enable(this);
         this.game.camera.follow(this);
         this.maxHealth = PLAYER_MAX_HEALTH;
-        this.health = 1; // TODO: start with less health for testing
+        this.health = this.maxHealth;
         this.tooFast = false;
         //Adding gamepad controller
         if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
             this.pad = this.game.input.gamepad.pad1;
         }
         this.allowJump = true;
+        this.immune = false;
     }
 
     update() {
@@ -116,11 +117,24 @@ export class Player extends Phaser.Sprite {
     }
 
     loseHealth(health) {
-        this.health -= health;
+        if(!this.immune) {
+            this.health -= health;
+            this.immune = true;
+            let timer = this.game.time.create(this.game, true);
+            this.immunityTween = this.game.add.tween(this).to({ visible: false }, 0.01 * Phaser.Timer.SECOND, "Linear", true, 0, -1);
+            this.immunityTween.yoyo(true, 0);
+            timer.add(2*Phaser.Timer.SECOND, function() {
+                this.game.tweens.remove(this.immunityTween);
+                this.immune = false;
+                this.visible = true;
+            }, this);
+            timer.start();
+            this.state.updateHealthHud();
+        }
     }
 
     loseAllHealth() {
-        this.health = 0;
+        this.loseHealth(this.health);
     }
 
     isDead() {
