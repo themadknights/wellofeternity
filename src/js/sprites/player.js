@@ -91,12 +91,12 @@ export class Player extends Phaser.Sprite {
     }
 
     isMovingLeft() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.x < this.position.x;
     }
 
     isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.x > this.position.x;
     }
 
@@ -105,13 +105,13 @@ export class Player extends Phaser.Sprite {
     }
 
     isJumping() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.W) || this.pad &&
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.W) || this.pad &&
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
     }
 
     isGrabbingTheRope() {
-        return this.game.input.keyboard.isDown(Phaser.Keyboard.W) || this.pad &&
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.W) || this.pad &&
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
         this.game.input.activePointer.isDown;
     }
