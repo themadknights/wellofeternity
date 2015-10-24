@@ -3,10 +3,11 @@ export class GameOverState extends Phaser.State {
         super();
     }
 
+    init(score) {
+        this.score = score;
+    }
 
     create () {
-        console.log(this.game.width);
-        console.log(this.game.height);
         this.world.setBounds(0, 0, this.game.width, this.game.height);
         this.canClose = false;
         let timer = this.time.create(this.game, true);
@@ -16,6 +17,8 @@ export class GameOverState extends Phaser.State {
             this.closeText.anchor.setTo(0.5);
         }, this);
         timer.start();
+        this.scoreText = this.game.add.bitmapText(this.game.world.centerX, this.game.world.centerY - 48, 'carrier_command', `SCORE: ${this.score}`, 18);
+        this.scoreText.anchor.setTo(0.5);
         this.gameOverText = this.game.add.bitmapText(this.game.world.centerX, this.game.world.centerY, 'carrier_command', "GAME OVER", 18);
         this.gameOverText.anchor.setTo(0.5);
     }

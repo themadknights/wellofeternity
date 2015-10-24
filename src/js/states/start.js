@@ -88,7 +88,7 @@ export class StartState extends Phaser.State {
 
         // HUD
         this.score = 0;
-        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
+        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', `Score: ${pad(this.score)}`, 12);
         this.scoreLabel.anchor.setTo(1, 0);
         this.scoreLabel.fixedToCamera = true;
 
@@ -147,7 +147,7 @@ export class StartState extends Phaser.State {
     }
 
     gameOver() {
-        this.game.state.start('gameover');
+        this.game.state.start('gameover', true, false, this.score);
     }
 
     addScore (amount) {
