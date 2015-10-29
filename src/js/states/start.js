@@ -26,8 +26,8 @@ export class StartState extends Phaser.State {
         this.enemies.add(new Enemy(this.game, 200, 600));
 
         //Chest group
-        // this.chests = this.game.add.group();
-        // this.chests.add(new Chest(this.game, 448, 468));
+        this.chests = this.game.add.group();
+        this.chests.add(new Chest(this.game, 448, 468));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -50,13 +50,13 @@ export class StartState extends Phaser.State {
         }
 
         //Spikes logic (Tiles: 99)
-        // this.map.setTileIndexCallback([12,13,14,15], function(player) {
-        //     //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-        //     if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
-        //         player.loseAllHealth();
-        //         // console.log(player.body.velocity.y);
-        //     }
-        // }, this);
+        this.map.setTileIndexCallback([12,13,14,15], function(player) {
+            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
+            if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
+                player.loseAllHealth();
+                // console.log(player.body.velocity.y);
+            }
+        }, this);
 
         //TODO: Example of spikes, to be deleted when the map generation is done
         //The player can walk over spikes if they are 2 and he walks quickly
