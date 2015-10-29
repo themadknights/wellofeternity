@@ -177,7 +177,7 @@ export class StartState extends Phaser.State {
 
     createWalls () {
         let leftWall = this.game.add.tileSprite(0, 0, 16, this.game.world.height, 'wall');
-        let rightWall = this.game.add.tileSprite(this.game.world.width, 0, 16, this.game.world.height, 'wall');
+        let rightWall = this.game.add.tileSprite(this.game.width, 0, 16, this.game.world.height, 'wall');
 
         this.walls = this.game.add.group();
         this.walls.enableBody = true; // Enable physics for the whole group
