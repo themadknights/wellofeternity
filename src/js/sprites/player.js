@@ -1,7 +1,7 @@
 const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 1000;
-const PLAYER_VELOCITY = 300;
-const PLAYER_JUMP_VELOCITY = 300;
+const PLAYER_VELOCITY = 200;
+const PLAYER_JUMP_VELOCITY = 200;
 const PLAYER_JUMP_SWIPE_THRESHOLD = 50;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
@@ -46,13 +46,13 @@ export class Player extends Phaser.Sprite {
             this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
         }
 
-        this.body.allowGravity = true;
-        // player.body.velocity.y = 0;
-        this.state.physics.arcade.overlap(this, this.state.rope, function(player) {
-            if (player.isGrabbingTheRope()) {
-                player.disableGravity();
-            }
-        });
+        // this.body.allowGravity = true;
+        // // player.body.velocity.y = 0;
+        // this.state.physics.arcade.overlap(this, this.state.rope, function(player) {
+        //     if (player.isGrabbingTheRope()) {
+        //         player.disableGravity();
+        //     }
+        // });
 
         this.state.physics.arcade.overlap(this, this.state.chests, function(player, chest) {
             if(!chest.open) {
