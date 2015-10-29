@@ -69,41 +69,7 @@ export class Player extends Phaser.Sprite {
         }
 
         this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
-
-        this.gameState.physics.arcade.overlap(this, this.gameState.chests, function(player, chest) {
-            if(!chest.open) {
-                //Opening the chest and cancel player jump
-                player.allowJump = false;
-                if(player.isGrabbingTheRope()) {
-                    chest.open = true;
-                    //Spawning coins
-                    let n = this.game.rnd.integerInRange(1, 5);
-                    for(let i = 0; i < n; i++) {
-                        let coin = this.gameState.coins.getFirstExists(false);
-                        if(coin) {
-                            coin.reset(chest.x, chest.y);
-                        } else {
-                            coin = this.gameState.coins.create(chest.x, chest.y, 'coin');
-                            coin.anchor.setTo(0.5);
-                        }
-                        coin.allowedPickup = false;
-                        let coinTimer = this.game.time.create(this.game, true);
-                        coinTimer.add(1*Phaser.Timer.SECOND, function() {
-                            coin.allowedPickup = true;
-                        }, this);
-                        coinTimer.start();
-                        coin.body.bounce.set(0.9);
-                        coin.body.velocity.x = this.game.rnd.between(-100, 100);
-                        coin.body.velocity.y = this.game.rnd.between(-200, -50);
-                    }
-                    let timer = this.game.time.create(this.game, true);
-                    timer.add(0.5*Phaser.Timer.SECOND, function() {
-                        player.allowJump = true;
-                    }, this);
-                    timer.start();
-                }
-            }
-        }, null, this);
+        this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
     }
 
     isMovingLeft() {
@@ -131,6 +97,22 @@ export class Player extends Phaser.Sprite {
             this.state = PLAYER_STATE_GRABBING_THE_ROPE;
             this.position.x = this.gameState.rope.x;
             this.disableGravity();
+        }
+    }
+
+    onOverlapChest(chest) {
+        if(!chest.open) {
+            //Opening the chest and cancel player jump
+            this.allowJump = false;
+            if(this.isGrabbingTheRope()) {
+                chest.open = true;
+                chest.spawnCoins();
+                let timer = this.game.time.create(this.game, true);
+                timer.add(0.5*Phaser.Timer.SECOND, function() {
+                    this.allowJump = true;
+                }, this);
+                timer.start();
+            }
         }
     }
 
