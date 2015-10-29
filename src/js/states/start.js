@@ -140,6 +140,8 @@ export class StartState extends Phaser.State {
         if (this.player.isDead()) {
             this.gameOver();
         }
+
+        this.rope.autoScroll(0, -this.player.body.velocity.y / 2);
     }
 
     render() {
@@ -167,11 +169,12 @@ export class StartState extends Phaser.State {
     }
 
     createRope () {
-        this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
+        this.rope = this.game.add.tileSprite(this.game.width / 2, 0, 16, this.game.height, 'rope');
         this.game.physics.arcade.enable(this.rope);
         this.rope.anchor.setTo(0.5, 0);
         this.rope.body.immovable = true;
         this.rope.body.allowGravity = false;
+        this.rope.fixedToCamera = true;
         this.rope.sendToBack();
     }
 
