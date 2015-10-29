@@ -100,11 +100,11 @@ export class Player extends Phaser.Sprite {
         }
     }
 
-    onOverlapChest(chest) {
+    onOverlapChest(chest, inputDownOnChest = false) {
         if(!chest.open) {
             //Opening the chest and cancel player jump
             this.allowJump = false;
-            if(this.isGrabbingTheRope()) {
+            if(inputDownOnChest || this.isGrabbingTheRope()) {
                 chest.open = true;
                 chest.spawnCoins();
                 let timer = this.game.time.create(this.game, true);
