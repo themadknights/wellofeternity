@@ -86,33 +86,16 @@ export class StartState extends Phaser.State {
             this.map.putTile(98, i, 99);
         }
 
-        // HUD
-        this.score = 0;
-        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', `Score: ${pad(this.score)}`, 12);
-        this.scoreLabel.anchor.setTo(1, 0);
-        this.scoreLabel.fixedToCamera = true;
-
-        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
-        this.healthLabel.fixedToCamera = true;
-
-        this.healthIcons = this.game.add.group();
-        this.healthIcons.fixedToCamera = true;
-        for (i = 0; i < this.player.maxHealth; i += 1) {
-            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
-            icon.anchor.setTo(0.5);
-            this.healthIcons.add(icon);
-        }
-        this.updateHealthHud();
-
         this.platforms.resizeWorld();
 
         // Add walls
         this.createWalls();
-
         // Add rope to the back of the scene but in front background
         this.createRope();
          // Add simple background as tile sprite
         this.createBackground();
+        // Add hud in front of all the objects
+        this.createHUD();
     }
 
     update() {
@@ -195,6 +178,25 @@ export class StartState extends Phaser.State {
         rightWall.anchor.setTo(1, 0);
         rightWall.body.immovable = true;
         rightWall.body.allowGravity = false;
+    }
+
+    createHUD () {
+        this.score = 0;
+        this.scoreLabel = this.game.add.bitmapText(this.game.width - 10, 10, 'carrier_command', `Score: ${pad(this.score)}`, 12);
+        this.scoreLabel.anchor.setTo(1, 0);
+        this.scoreLabel.fixedToCamera = true;
+
+        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
+        this.healthLabel.fixedToCamera = true;
+
+        this.healthIcons = this.game.add.group();
+        this.healthIcons.fixedToCamera = true;
+        for (let i = 0; i < this.player.maxHealth; i += 1) {
+            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
+            icon.anchor.setTo(0.5);
+            this.healthIcons.add(icon);
+        }
+        this.updateHealthHud();
     }
 
     replaceRandomSpikes () {
