@@ -1,15 +1,20 @@
 const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 1000;
-const PLAYER_VELOCITY = 300;
-const PLAYER_JUMP_VELOCITY = 300;
+const PLAYER_VELOCITY = 200;
+const PLAYER_JUMP_VELOCITY = 200;
 const PLAYER_JUMP_SWIPE_THRESHOLD = 50;
+const PLAYER_MOVE_TOUCH_THRESHOLD = 20;
+const PLAYER_STATE_GROUND = 0;
+const PLAYER_STATE_JUMPING = 1;
+const PLAYER_STATE_FALLING = 2;
+const PLAYER_STATE_GRABBING_THE_ROPE = 3;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 export class Player extends Phaser.Sprite {
 
     constructor(game, state, x, y) {
         super(game, x, y, 'player');
-        this.state = state;
+        this.gameState = state;
         this.anchor.setTo(0.5);
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
@@ -22,7 +27,10 @@ export class Player extends Phaser.Sprite {
             this.pad = this.game.input.gamepad.pad1;
         }
         this.allowJump = true;
+        this.allowGrab = true;
         this.immune = false;
+
+        this.wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
     }
 
     update() {
@@ -32,72 +40,46 @@ export class Player extends Phaser.Sprite {
         if(this.isMovingLeft()) {
             this.body.velocity.x -= PLAYER_VELOCITY;
             this.scale.setTo(-1, 1);
+            this.body.allowGravity = true;
         }
         if(this.isMovingRight()) {
             this.body.velocity.x += PLAYER_VELOCITY;
             this.scale.setTo(1, 1);
+            this.body.allowGravity = true;
         }
 
-        if(this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
-            this.tooFast = true;
-        }
-
-        if (this.canJump() && this.isJumping()) {
-            this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
-        }
-
-        this.body.allowGravity = true;
-        // player.body.velocity.y = 0;
-        this.state.physics.arcade.overlap(this, this.state.rope, function(player) {
-            if (player.isGrabbingTheRope()) {
-                player.disableGravity();
+        if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
+            if (this.canJump() && this.isJumping()) {
+                this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
+                this.allowGrab = false;
+                this.wKey.onUp.addOnce(() => this.allowGrab = true);
             }
-        });
+        }
 
-        this.state.physics.arcade.overlap(this, this.state.chests, function(player, chest) {
-            if(!chest.open) {
-                //Opening the chest and cancel player jump
-                player.allowJump = false;
-                if(player.isGrabbingTheRope()) {
-                    chest.open = true;
-                    //Spawning coins
-                    let n = this.game.rnd.integerInRange(1, 5);
-                    for(let i = 0; i < n; i++) {
-                        let coin = this.state.coins.getFirstExists(false);
-                        if(coin) {
-                            coin.reset(chest.x, chest.y);
-                        } else {
-                            coin = this.state.coins.create(chest.x, chest.y, 'coin');
-                            coin.anchor.setTo(0.5);
-                        }
-                        coin.allowedPickup = false;
-                        let coinTimer = this.game.time.create(this.game, true);
-                        coinTimer.add(1*Phaser.Timer.SECOND, function() {
-                            coin.allowedPickup = true;
-                        }, this);
-                        coinTimer.start();
-                        coin.body.bounce.set(0.9);
-                        coin.body.velocity.x = this.game.rnd.between(-100, 100);
-                        coin.body.velocity.y = this.game.rnd.between(-200, -50);
-                    }
-                    let timer = this.game.time.create(this.game, true);
-                    timer.add(0.5*Phaser.Timer.SECOND, function() {
-                        player.allowJump = true;
-                    }, this);
-                    timer.start();
-                }
+        // Check player velocity in y to set his state
+        if(this.body.velocity.y < 0) {
+            this.state = PLAYER_STATE_JUMPING;
+        } else if(this.body.velocity.y > 0) {
+            if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
+                this.tooFast = true;
             }
-        }, null, this);
+            this.state = PLAYER_STATE_FALLING;
+        } else if (this.body.blocked.down) {
+            this.state = PLAYER_STATE_GROUND;
+        }
+
+        this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
+        this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
     }
 
     isMovingLeft() {
         return this.game.input.keyboard.isDown(Phaser.KeyCode.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
-        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x < this.position.x;
+        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x < this.position.x && Math.abs( this.game.input.activePointer.position.x - this.position.x) > PLAYER_MOVE_TOUCH_THRESHOLD;
     }
 
     isMovingRight() {
         return this.game.input.keyboard.isDown(Phaser.KeyCode.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
-        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x > this.position.x;
+        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x > this.position.x && Math.abs( this.game.input.activePointer.position.x - this.position.x) > PLAYER_MOVE_TOUCH_THRESHOLD;
     }
 
     canJump() {
@@ -105,15 +87,37 @@ export class Player extends Phaser.Sprite {
     }
 
     isJumping() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.W) || this.pad &&
+        return this.wKey.isDown || this.pad &&
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
     }
 
+    onOverlapRope(inputDownOnRope = false) {
+        if (this.allowGrab && this.state !== PLAYER_STATE_GRABBING_THE_ROPE && (inputDownOnRope || this.isGrabbingTheRope())) {
+            this.state = PLAYER_STATE_GRABBING_THE_ROPE;
+            this.position.x = this.gameState.rope.x;
+            this.disableGravity();
+        }
+    }
+
+    onOverlapChest(chest, inputDownOnChest = false) {
+        if(!chest.opened) {
+            //Opening the chest and cancel player jump
+            this.allowJump = false;
+            if(inputDownOnChest || this.isGrabbingTheRope()) {
+                chest.open();
+                let timer = this.game.time.create(this.game, true);
+                timer.add(0.5*Phaser.Timer.SECOND, function() {
+                    this.allowJump = true;
+                }, this);
+                timer.start();
+            }
+        }
+    }
+
     isGrabbingTheRope() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.W) || this.pad &&
-        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
-        this.game.input.activePointer.isDown;
+        return this.wKey.isDown || this.pad &&
+        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1);
     }
 
     loseHealth(health) {
@@ -129,7 +133,7 @@ export class Player extends Phaser.Sprite {
                 this.visible = true;
             }, this);
             timer.start();
-            this.state.updateHealthHud();
+            this.gameState.updateHealthHud();
         }
     }
 

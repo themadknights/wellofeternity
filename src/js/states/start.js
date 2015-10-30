@@ -27,7 +27,7 @@ export class StartState extends Phaser.State {
 
         //Chest group
         this.chests = this.game.add.group();
-        this.chests.add(new Chest(this.game, 448, 468));
+        this.chests.add(new Chest(this.game, this, 448, 468));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -173,6 +173,11 @@ export class StartState extends Phaser.State {
         this.rope.body.immovable = true;
         this.rope.body.allowGravity = false;
         this.rope.sendToBack();
+        this.rope.inputEnabled = true;
+        this.rope.events.onInputDown.add(() => {
+            this.player.allowGrab = true;
+            this.physics.arcade.overlap(this.player, this.rope, (player) => player.onOverlapRope(true));
+        });
     }
 
     createWalls () {
