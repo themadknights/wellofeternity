@@ -21,17 +21,17 @@ export class StartState extends Phaser.State {
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
-        // //Enemies group
-        // this.enemies = this.game.add.group();
-        // this.enemies.add(new Enemy(this.game, 200, 600));
+        //Enemies group
+        this.enemies = this.game.add.group();
+        this.enemies.add(new Enemy(this.game, 200, 600));
 
-        // //Chest group
-        // this.chests = this.game.add.group();
-        // this.chests.add(new Chest(this.game, this, 448, 468));
-        //
-        // //Coins group
-        // this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
-        // this.coins.enableBody = true;
+        //Chest group
+        this.chests = this.game.add.group();
+        this.chests.add(new Chest(this.game, this, 448, 468));
+
+        //Coins group
+        this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.coins.enableBody = true;
 
         //Player
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
@@ -40,68 +40,60 @@ export class StartState extends Phaser.State {
         this.mapPresets = this.game.cache.getJSON('presets');
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
-        this.platforms = this.map.create('platforms', 20, 100, 32, 32);
-        // this.generateWorldChunk(20);
+        this.platforms = this.map.create('platforms', 25, 100, 32, 32);
+        this.generateWorldChunk(20);
         this.map.setCollisionBetween(0, 5);
 
         //TODO: Example of platform, to be deleted when the map generation is done
-        for(i = 0; i < 20; i++) {
-            this.map.putTile(5, i, 20);
-            // this.map.putTile(i%6+6, 10+i, 16);
+        for(i = 0; i < 15; i++) {
+            this.map.putTile(i%6, 10+i, 15);
+            this.map.putTile(i%6+6, 10+i, 16);
         }
 
-        //TODO: check deprecation when hook collide with tiles
-        this.map.setTileIndexCallback([0,1,2,3,4,5], function(player) {
-            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
-                player.grabHook();
+        //Spikes logic (Tiles: 99)
+        this.map.setTileIndexCallback([12,13,14,15], function(player) {
+            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
+            if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
+                player.loseAllHealth();
+                // console.log(player.body.velocity.y);
             }
-            return true;
         }, this);
 
-        // //Spikes logic (Tiles: 99)
-        // this.map.setTileIndexCallback([12,13,14,15], function(player) {
-        //     //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-        //     if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
-        //         player.loseAllHealth();
-        //         // console.log(player.body.velocity.y);
-        //     }
-        // }, this);
+        //TODO: Example of spikes, to be deleted when the map generation is done
+        //The player can walk over spikes if they are 2 and he walks quickly
+        this.map.putTile(12, 15, 15);
+        this.map.putTile(12, 16, 15);
+        //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
+        this.map.putTile(12, 18, 15);
+        //The player die
+        this.map.putTile(12, 20, 15);
+        this.map.putTile(12, 21, 15);
+        this.map.putTile(12, 22, 15);
+        //The player can walk through spikes
+        this.map.putTile(12, 10, 14);
+        //Replace 12 index for 12..15 randomly
+        this.replaceRandomSpikes();
 
-        // //TODO: Example of spikes, to be deleted when the map generation is done
-        // //The player can walk over spikes if they are 2 and he walks quickly
-        // this.map.putTile(12, 15, 15);
-        // this.map.putTile(12, 16, 15);
-        // //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
-        // this.map.putTile(12, 18, 15);
-        // //The player die
-        // this.map.putTile(12, 20, 15);
-        // this.map.putTile(12, 21, 15);
-        // this.map.putTile(12, 22, 15);
-        // //The player can walk through spikes
-        // this.map.putTile(12, 10, 14);
-        // //Replace 12 index for 12..15 randomly
-        // this.replaceRandomSpikes();
-        //
-        // //Goal logic (Tiles: 98)
-        // this.map.setTileIndexCallback(98, function(player) {
-        //     // TODO: restart the level for now, same as player's death
-        //     if(player === this.player) {
-        //         this.gameOver();
-        //     }
-        // }, this);
-        //
-        // //TODO: Example of goal, to be deleted when the map generation si done
-        // for(i = 0; i < 25; i++) {
-        //     this.map.putTile(98, i, 99);
-        // }
+        //Goal logic (Tiles: 98)
+        this.map.setTileIndexCallback(98, function(player) {
+            // TODO: restart the level for now, same as player's death
+            if(player === this.player) {
+                this.gameOver();
+            }
+        }, this);
+
+        //TODO: Example of goal, to be deleted when the map generation si done
+        for(i = 0; i < 25; i++) {
+            this.map.putTile(98, i, 99);
+        }
 
         this.platforms.resizeWorld();
 
         // Add walls
         this.createWalls();
         // Add rope to the back of the scene but in front background
-        // this.createRope();
-         // Add simple background as tile sprite
+        this.createRope();
+        // Add simple background as tile sprite
         this.createBackground();
         // Add hud in front of all the objects
         this.createHUD();
@@ -111,9 +103,18 @@ export class StartState extends Phaser.State {
         this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
+            //TODO: check deprecation when hook collide with tiles
+            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
+                player.grabHook();
+            }
+
             if(player.tooFast) {
                 player.loseAllHealth();
             }
+        });
+
+        this.physics.arcade.collide(this.player.hook, this.platforms, () => {
+            this.player.onHookSet();
         });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
