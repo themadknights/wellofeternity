@@ -1,5 +1,5 @@
 import { Chest } from './sprite/chest';
-import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
+import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
 
@@ -49,6 +49,14 @@ export class StartState extends Phaser.State {
             this.map.putTile(5, i, 20);
             // this.map.putTile(i%6+6, 10+i, 16);
         }
+
+        //TODO: check deprecation when hook collide with tiles
+        this.map.setTileIndexCallback([0,1,2,3,4,5], function(player) {
+            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
+                player.grabHook();
+            }
+            return true;
+        }, this);
 
         // //Spikes logic (Tiles: 99)
         // this.map.setTileIndexCallback([12,13,14,15], function(player) {

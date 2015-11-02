@@ -9,7 +9,7 @@ const PLAYER_STATE_GROUND = 1;
 const PLAYER_STATE_JUMPING = 2;
 const PLAYER_STATE_FALLING = 3;
 const PLAYER_STATE_GRABBING_THE_ROPE = 4;
-const PLAYER_STATE_GRABBING_THE_HOOK = 5;
+export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 export class Player extends Phaser.Sprite {
@@ -32,19 +32,8 @@ export class Player extends Phaser.Sprite {
         this.allowGrab = true;
         this.immune = false;
 
-        this.hook = this.game.add.sprite(0, 0, 'hook');
-        this.hook.visible = false;
-        this.game.physics.arcade.enable(this.hook);
-        this.hook.body.allowGravity = false;
-
-        this.bmd = game.add.bitmapData(this.game.width, this.game.height);
-        var color = 'white';
-
-        this.bmd.ctx.beginPath();
-        this.bmd.ctx.lineWidth = "4";
-        this.bmd.ctx.strokeStyle = color;
-        this.bmd.ctx.stroke();
-        this.hookRope = game.add.sprite(0, 0, this.bmd);
+        // Create hook and hook rope
+        this.createHook();
 
         this.wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
     }
@@ -92,33 +81,13 @@ export class Player extends Phaser.Sprite {
                 this.game.physics.arcade.moveToPointer(this.hook, 800);
             }
 
-            this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => {
-                this.disableGravity();
-                this.hook.body.velocity.setTo(0);
-                this.game.physics.arcade.moveToObject(this, this.hook, 800);
-                this.state = PLAYER_STATE_GRABBING_THE_HOOK;
-            });
+            this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
         } else {
-            this.gameState.physics.arcade.overlap(this, this.hook, () => {
-                this.hook.visible = false;
-                this.state = PLAYER_STATE_IDLE;
-                this.body.velocity.y = 0;
-                this.body.allowGravity = true;
-                this.bmd.clear();
-            });
+            this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
         }
 
         if (this.hook.visible) {
-             this.bmd.clear();
-             this.bmd.ctx.beginPath();
-             this.bmd.ctx.beginPath();
-             this.bmd.ctx.moveTo(this.body.center.x, this.body.center.y);
-             this.bmd.ctx.lineTo(this.hook.body.center.x, this.hook.body.center.y);
-             this.bmd.ctx.lineWidth = 4;
-             this.bmd.ctx.stroke();
-             this.bmd.ctx.closePath();
-             this.bmd.render();
-            //  this.bmd.refreshBuffer();
+             this.drawHookRope();
         }
 
         this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
@@ -205,5 +174,45 @@ export class Player extends Phaser.Sprite {
     disableGravity () {
         this.body.allowGravity = false;
         this.body.velocity.y = 0;
+    }
+
+    createHook () {
+        this.hook = this.game.add.sprite(0, 0, 'hook');
+        this.hook.visible = false;
+        this.game.physics.arcade.enable(this.hook);
+        this.hook.body.allowGravity = false;
+        this.hookRope = this.game.add.bitmapData(this.game.width, this.game.height);
+        this.hookRope.ctx.beginPath();
+        this.hookRope.ctx.lineWidth = "2";
+        this.hookRope.ctx.strokeStyle = 'white';
+        this.hookRope.ctx.stroke();
+        this.hookRopeSprite = this.game.add.sprite(0, 0, this.hookRope);
+    }
+
+    onHookSet () {
+        this.disableGravity();
+        this.hook.body.velocity.setTo(0);
+        this.game.physics.arcade.moveToObject(this, this.hook, 800);
+        this.state = PLAYER_STATE_GRABBING_THE_HOOK;
+    }
+
+    grabHook () {
+        this.hook.visible = false;
+        this.state = PLAYER_STATE_IDLE;
+        this.body.velocity.y = 0;
+        this.body.allowGravity = true;
+        this.hookRope.clear();
+    }
+
+    drawHookRope () {
+        this.hookRope.clear();
+        this.hookRope.ctx.beginPath();
+        this.hookRope.ctx.beginPath();
+        this.hookRope.ctx.moveTo(this.body.center.x, this.body.center.y);
+        this.hookRope.ctx.lineTo(this.hook.body.center.x, this.hook.body.center.y);
+        this.hookRope.ctx.lineWidth = 2;
+        this.hookRope.ctx.stroke();
+        this.hookRope.ctx.closePath();
+        this.hookRope.render();
     }
 }
