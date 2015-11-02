@@ -87,7 +87,7 @@ export class Player extends Phaser.Sprite {
         }
 
         if (this.hook.visible) {
-             this.drawHookRope();
+            this.drawHookRope();
         }
 
         this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
@@ -181,12 +181,8 @@ export class Player extends Phaser.Sprite {
         this.hook.visible = false;
         this.game.physics.arcade.enable(this.hook);
         this.hook.body.allowGravity = false;
-        this.hookRope = this.game.add.bitmapData(this.game.width, this.game.height);
-        this.hookRope.ctx.beginPath();
-        this.hookRope.ctx.lineWidth = "2";
-        this.hookRope.ctx.strokeStyle = 'white';
-        this.hookRope.ctx.stroke();
-        this.hookRopeSprite = this.game.add.sprite(0, 0, this.hookRope);
+        this.line = new Phaser.Line(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
+        this.rope = this.game.add.graphics(0, 0);
     }
 
     onHookSet () {
@@ -201,17 +197,15 @@ export class Player extends Phaser.Sprite {
         this.state = PLAYER_STATE_IDLE;
         this.body.velocity.y = 0;
         this.body.allowGravity = true;
-        this.hookRope.clear();
+        this.rope.clear();
     }
 
     drawHookRope () {
-        this.hookRope.clear();
-        this.hookRope.ctx.beginPath();
-        this.hookRope.ctx.moveTo(this.body.center.x, this.body.center.y);
-        this.hookRope.ctx.lineTo(this.hook.body.center.x, this.hook.body.center.y);
-        this.hookRope.ctx.lineWidth = 2;
-        this.hookRope.ctx.stroke();
-        this.hookRope.ctx.closePath();
-        this.hookRope.render();
+        this.line.setTo(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
+        this.rope.clear();
+        this.rope.lineStyle(1, 0xffffff, 1);
+        this.rope.moveTo(this.line.start.x, this.line.start.y);
+        this.rope.lineTo(this.line.end.x, this.line.end.y);
+        this.rope.endFill();
     }
 }
