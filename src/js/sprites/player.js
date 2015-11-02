@@ -207,7 +207,6 @@ export class Player extends Phaser.Sprite {
     drawHookRope () {
         this.hookRope.clear();
         this.hookRope.ctx.beginPath();
-        this.hookRope.ctx.beginPath();
         this.hookRope.ctx.moveTo(this.body.center.x, this.body.center.y);
         this.hookRope.ctx.lineTo(this.hook.body.center.x, this.hook.body.center.y);
         this.hookRope.ctx.lineWidth = 2;
