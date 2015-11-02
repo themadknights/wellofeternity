@@ -81,6 +81,9 @@ export class Player extends Phaser.Sprite {
                 this.game.physics.arcade.moveToPointer(this.hook, 800);
             }
 
+            this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
+            this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
+
             this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
         } else {
             this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
@@ -89,9 +92,6 @@ export class Player extends Phaser.Sprite {
         if (this.hook.visible) {
             this.drawHookRope();
         }
-
-        this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
-        this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
     }
 
     isMovingLeft() {
