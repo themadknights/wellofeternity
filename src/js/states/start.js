@@ -1,5 +1,5 @@
 import { Chest } from './sprite/chest';
-import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
+import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
 
@@ -43,6 +43,7 @@ export class StartState extends Phaser.State {
         this.platforms = this.map.create('platforms', 25, 100, 32, 32);
         this.generateWorldChunk(20);
         this.map.setCollisionBetween(0, 5);
+
         //TODO: Example of platform, to be deleted when the map generation is done
         for(i = 0; i < 15; i++) {
             this.map.putTile(i%6, 10+i, 15);
@@ -92,7 +93,7 @@ export class StartState extends Phaser.State {
         this.createWalls();
         // Add rope to the back of the scene but in front background
         this.createRope();
-         // Add simple background as tile sprite
+        // Add simple background as tile sprite
         this.createBackground();
         // Add hud in front of all the objects
         this.createHUD();
@@ -102,9 +103,18 @@ export class StartState extends Phaser.State {
         this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
+            //TODO: check deprecation when hook collide with tiles
+            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
+                player.grabHook();
+            }
+
             if(player.tooFast) {
                 player.loseAllHealth();
             }
+        });
+
+        this.physics.arcade.collide(this.player.hook, this.platforms, () => {
+            this.player.onHookSet();
         });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {

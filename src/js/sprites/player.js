@@ -4,10 +4,12 @@ const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
 const PLAYER_JUMP_SWIPE_THRESHOLD = 50;
 const PLAYER_MOVE_TOUCH_THRESHOLD = 20;
-const PLAYER_STATE_GROUND = 0;
-const PLAYER_STATE_JUMPING = 1;
-const PLAYER_STATE_FALLING = 2;
-const PLAYER_STATE_GRABBING_THE_ROPE = 3;
+const PLAYER_STATE_IDLE = 0;
+const PLAYER_STATE_GROUND = 1;
+const PLAYER_STATE_JUMPING = 2;
+const PLAYER_STATE_FALLING = 3;
+const PLAYER_STATE_GRABBING_THE_ROPE = 4;
+export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 export class Player extends Phaser.Sprite {
@@ -30,46 +32,66 @@ export class Player extends Phaser.Sprite {
         this.allowGrab = true;
         this.immune = false;
 
+        // Create hook and hook rope
+        this.createHook();
+
         this.wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
     }
 
     update() {
-        //Checking Input
-        this.body.velocity.x = 0;
+        if (this.state !== PLAYER_STATE_GRABBING_THE_HOOK) {
+            //Checking Input
+            this.body.velocity.x = 0;
 
-        if(this.isMovingLeft()) {
-            this.body.velocity.x -= PLAYER_VELOCITY;
-            this.scale.setTo(-1, 1);
-            this.body.allowGravity = true;
-        }
-        if(this.isMovingRight()) {
-            this.body.velocity.x += PLAYER_VELOCITY;
-            this.scale.setTo(1, 1);
-            this.body.allowGravity = true;
-        }
-
-        if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
-            if (this.canJump() && this.isJumping()) {
-                this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
-                this.allowGrab = false;
-                this.wKey.onUp.addOnce(() => this.allowGrab = true);
+            if(this.isMovingLeft()) {
+                this.body.velocity.x -= PLAYER_VELOCITY;
+                this.scale.setTo(-1, 1);
+                this.body.allowGravity = true;
             }
-        }
-
-        // Check player velocity in y to set his state
-        if(this.body.velocity.y < 0) {
-            this.state = PLAYER_STATE_JUMPING;
-        } else if(this.body.velocity.y > 0) {
-            if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
-                this.tooFast = true;
+            if(this.isMovingRight()) {
+                this.body.velocity.x += PLAYER_VELOCITY;
+                this.scale.setTo(1, 1);
+                this.body.allowGravity = true;
             }
-            this.state = PLAYER_STATE_FALLING;
-        } else if (this.body.blocked.down) {
-            this.state = PLAYER_STATE_GROUND;
+
+            if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
+                if (this.canJump() && this.isJumping()) {
+                    this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
+                    this.allowGrab = false;
+                    this.wKey.onUp.addOnce(() => this.allowGrab = true);
+                }
+            }
+
+            // Check player velocity in y to set his state
+            if(this.body.velocity.y < 0) {
+                this.state = PLAYER_STATE_JUMPING;
+            } else if(this.body.velocity.y > 0) {
+                if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
+                    this.tooFast = true;
+                }
+                this.state = PLAYER_STATE_FALLING;
+            } else if (this.body.blocked.down) {
+                this.state = PLAYER_STATE_GROUND;
+            }
+
+            // Shoot hook
+            if(this.isShootingHook() && !this.hook.visible) {
+                this.hook.reset(this.body.center.x, this.body.center.y);
+                this.hook.visible = true;
+                this.game.physics.arcade.moveToPointer(this.hook, 800);
+            }
+
+            this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
+            this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
+
+            this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
+        } else {
+            this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
         }
 
-        this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
-        this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
+        if (this.hook.visible) {
+            this.drawHookRope();
+        }
     }
 
     isMovingLeft() {
@@ -90,6 +112,10 @@ export class Player extends Phaser.Sprite {
         return this.wKey.isDown || this.pad &&
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
         this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
+    }
+
+    isShootingHook() {
+        return this.game.input.activePointer.isDown;
     }
 
     onOverlapRope(inputDownOnRope = false) {
@@ -148,5 +174,38 @@ export class Player extends Phaser.Sprite {
     disableGravity () {
         this.body.allowGravity = false;
         this.body.velocity.y = 0;
+    }
+
+    createHook () {
+        this.hook = this.game.add.sprite(0, 0, 'hook');
+        this.hook.visible = false;
+        this.game.physics.arcade.enable(this.hook);
+        this.hook.body.allowGravity = false;
+        this.line = new Phaser.Line(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
+        this.rope = this.game.add.graphics(0, 0);
+    }
+
+    onHookSet () {
+        this.disableGravity();
+        this.hook.body.velocity.setTo(0);
+        this.game.physics.arcade.moveToObject(this, this.hook, 800);
+        this.state = PLAYER_STATE_GRABBING_THE_HOOK;
+    }
+
+    grabHook () {
+        this.hook.visible = false;
+        this.state = PLAYER_STATE_IDLE;
+        this.body.velocity.y = 0;
+        this.body.allowGravity = true;
+        this.rope.clear();
+    }
+
+    drawHookRope () {
+        this.line.setTo(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
+        this.rope.clear();
+        this.rope.lineStyle(1, 0xffffff, 1);
+        this.rope.moveTo(this.line.start.x, this.line.start.y);
+        this.rope.lineTo(this.line.end.x, this.line.end.y);
+        this.rope.endFill();
     }
 }
