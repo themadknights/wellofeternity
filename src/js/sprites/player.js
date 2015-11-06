@@ -20,6 +20,7 @@ export class Player extends Phaser.Sprite {
         this.anchor.setTo(0.5);
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
+        this.body.width -= 8;
         this.game.camera.follow(this);
         this.maxHealth = PLAYER_MAX_HEALTH;
         this.health = this.maxHealth;
