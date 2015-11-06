@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="platform" tilewidth="32" tileheight="32">
+  <image source="../images/platform.png" width="192" height="96"/>
+ </tileset>
+ <layer name="Capa de Patrones 1" width="20" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAeMAIxExAzAzELELNC+axI4qQAdiDmAGJOIOYCYm4onwNJfLADdP+jhw8bieZxMmCGBzKfhyquHpqA1ukPneamiqtpC6id/mDhgU6Ppj/apj/kMB5K6Q8AXMkCNA==
+  </data>
+ </layer>
+ <layer name="Capa de patrones 2" width="20" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYMANGIGYDQ+fVMAOxDx4+KOAgYEJiJmBmAWIWRkoC28Q4ABiTiDmAmJuhtHwHgW0A6DyAT39UgJA5QN6+h0FCDAYymcA304A6w==
+  </data>
+ </layer>
+ <layer name="Capa de patrones 3" width="20" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFyIARiJmAmBmIWYCYFQufjQTz2IGYA4g5kWguIOZGonmo5HZ6gdEwGjyAnPBGB8jxSY3wRo7PkQZGWnwAADzzAaE=
+  </data>
+ </layer>
+</map>
