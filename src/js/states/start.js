@@ -41,7 +41,10 @@ export class StartState extends Phaser.State {
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 20, 100, 32, 32);
-        this.generateWorldChunk(20);
+        for(i = 1; i < 5; i++) {
+            this.generateWorldChunk(20*i);
+        }
+
         this.map.setCollisionBetween(0, 5);
 
         //TODO: Example of platform, to be deleted when the map generation is done
