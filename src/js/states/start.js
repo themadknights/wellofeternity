@@ -23,11 +23,11 @@ export class StartState extends Phaser.State {
 
         //Enemies group
         this.enemies = this.game.add.group();
-        this.enemies.add(new Enemy(this.game, 200, 600));
+        this.enemies.add(new Enemy(this.game, 200, 640));
 
         //Chest group
         this.chests = this.game.add.group();
-        this.chests.add(new Chest(this.game, this, 448, 462));
+        this.chests.add(new Chest(this.game, this, 432, 480));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -37,15 +37,21 @@ export class StartState extends Phaser.State {
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Creating the map and its main layer, resizering the world to fix that layer
-        this.mapPresets = this.game.cache.getJSON('presets');
+        this.mapPresets = [];
+        for(i = 0; i < 3; i++) {
+            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
+        }
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
-        this.platforms = this.map.create('platforms', 25, 100, 32, 32);
-        this.generateWorldChunk(20);
+        this.platforms = this.map.create('platforms', 20, 100, 32, 32);
+        for(i = 1; i < 5; i++) {
+            this.generateWorldChunk(20*i);
+        }
+
         this.map.setCollisionBetween(0, 5);
 
         //TODO: Example of platform, to be deleted when the map generation is done
-        for(i = 0; i < 15; i++) {
+        for(i = 0; i < 10; i++) {
             this.map.putTile(i%6, 10+i, 15);
             this.map.putTile(i%6+6, 10+i, 16);
         }
@@ -60,16 +66,9 @@ export class StartState extends Phaser.State {
         }, this);
 
         //TODO: Example of spikes, to be deleted when the map generation is done
-        //The player can walk over spikes if they are 2 and he walks quickly
         this.map.putTile(12, 15, 15);
         this.map.putTile(12, 16, 15);
-        //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
         this.map.putTile(12, 18, 15);
-        //The player die
-        this.map.putTile(12, 20, 15);
-        this.map.putTile(12, 21, 15);
-        this.map.putTile(12, 22, 15);
-        //The player can walk through spikes
         this.map.putTile(12, 10, 14);
         //Replace 12 index for 12..15 randomly
         this.replaceRandomSpikes();
@@ -83,7 +82,7 @@ export class StartState extends Phaser.State {
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
-        for(i = 0; i < 25; i++) {
+        for(i = 0; i < 20; i++) {
             this.map.putTile(98, i, 99);
         }
 
@@ -219,10 +218,22 @@ export class StartState extends Phaser.State {
     }
 
     generateWorldChunk(y) {
-        var mapChunk = this.mapPresets.data[this.game.rnd.integerInRange(0,2)];
-        var i = 0;
+        var preset   = this.game.rnd.integerInRange(0,2),
+            mapChunk = this.mapPresets[preset].layers[0].data,
+            i        = -1;
         this.map.forEach(function(tile) {
             tile.index = mapChunk[i++] - 1;
-        }, this, 0, y, 25, 20);
+        }, this, 0, y, 20, 20);
+
+        this.mapPresets[preset].layers[1].objects.forEach(function(object) {
+            switch(object.type) {
+                case 'bat':
+                    this.enemies.add(new Enemy(this.game, object.x, object.y + y*32));
+                    break;
+                case 'chest':
+                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32));
+                    break;
+            }
+        }, this);
     }
 }

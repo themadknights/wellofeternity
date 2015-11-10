@@ -2,7 +2,7 @@ export class Chest extends Phaser.Sprite {
     constructor(game, state, x, y) {
         super(game, x, y, 'chest');
         this.gameState = state;
-        this.anchor.setTo(0.5);
+        this.anchor.setTo(0, 1);
         this.game.add.existing(this);
         this.game.physics.arcade.enable(this);
         this.opened = false;
