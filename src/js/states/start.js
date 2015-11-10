@@ -1,5 +1,5 @@
 import { Chest } from './sprite/chest';
-import { Player, PLAYER_SPIKE_VELOCITY } from './sprites/player';
+import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
 import { Enemy } from './sprites/enemy';
 import { pad } from './utils';
 
@@ -23,11 +23,11 @@ export class StartState extends Phaser.State {
 
         //Enemies group
         this.enemies = this.game.add.group();
-        this.enemies.add(new Enemy(this.game, 200, 600));
+        this.enemies.add(new Enemy(this.game, 200, 640));
 
         //Chest group
         this.chests = this.game.add.group();
-        this.chests.add(new Chest(this.game, 448, 468));
+        this.chests.add(new Chest(this.game, this, 432, 480));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -37,14 +37,21 @@ export class StartState extends Phaser.State {
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Creating the map and its main layer, resizering the world to fix that layer
-        this.mapPresets = this.game.cache.getJSON('presets');
+        this.mapPresets = [];
+        for(i = 0; i < 3; i++) {
+            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
+        }
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
-        this.platforms = this.map.create('platforms', 25, 100, 32, 32);
-        this.generateWorldChunk(20);
+        this.platforms = this.map.create('platforms', 20, 100, 32, 32);
+        for(i = 1; i < 5; i++) {
+            this.generateWorldChunk(20*i);
+        }
+
         this.map.setCollisionBetween(0, 5);
+
         //TODO: Example of platform, to be deleted when the map generation is done
-        for(i = 0; i < 15; i++) {
+        for(i = 0; i < 10; i++) {
             this.map.putTile(i%6, 10+i, 15);
             this.map.putTile(i%6+6, 10+i, 16);
         }
@@ -59,16 +66,9 @@ export class StartState extends Phaser.State {
         }, this);
 
         //TODO: Example of spikes, to be deleted when the map generation is done
-        //The player can walk over spikes if they are 2 and he walks quickly
         this.map.putTile(12, 15, 15);
         this.map.putTile(12, 16, 15);
-        //The player can't fall <--- Maybe, the hitbox of the player should be smaller.
         this.map.putTile(12, 18, 15);
-        //The player die
-        this.map.putTile(12, 20, 15);
-        this.map.putTile(12, 21, 15);
-        this.map.putTile(12, 22, 15);
-        //The player can walk through spikes
         this.map.putTile(12, 10, 14);
         //Replace 12 index for 12..15 randomly
         this.replaceRandomSpikes();
@@ -77,51 +77,43 @@ export class StartState extends Phaser.State {
         this.map.setTileIndexCallback(98, function(player) {
             // TODO: restart the level for now, same as player's death
             if(player === this.player) {
-                this.restartLevel();
+                this.gameOver();
             }
         }, this);
 
         //TODO: Example of goal, to be deleted when the map generation si done
-        for(i = 0; i < 25; i++) {
+        for(i = 0; i < 20; i++) {
             this.map.putTile(98, i, 99);
         }
-
-        // HUD
-        this.score = 0;
-        this.scoreLabel = this.game.add.bitmapText(this.game.world.width - 10, 10, 'carrier_command', "Score: ", 12);
-        this.scoreLabel.anchor.setTo(1, 0);
-        this.scoreLabel.fixedToCamera = true;
-
-        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
-        this.healthLabel.fixedToCamera = true;
-
-        this.healthIcons = this.game.add.group();
-        this.healthIcons.fixedToCamera = true;
-        for (i = 0; i < this.player.maxHealth; i += 1) {
-            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
-            icon.anchor.setTo(0.5);
-            this.healthIcons.add(icon);
-        }
-        this.updateHealthHud();
 
         this.platforms.resizeWorld();
 
         // Add walls
         this.createWalls();
-
         // Add rope to the back of the scene but in front background
         this.createRope();
-         // Add simple background as tile sprite
+        // Add simple background as tile sprite
         this.createBackground();
+        // Add hud in front of all the objects
+        this.createHUD();
     }
 
     update() {
         this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.platforms, function(player) {
+            //TODO: check deprecation when hook collide with tiles
+            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
+                player.grabHook();
+            }
+
             if(player.tooFast) {
                 player.loseAllHealth();
             }
+        });
+
+        this.physics.arcade.collide(this.player.hook, this.platforms, () => {
+            this.player.onHookSet();
         });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
@@ -138,19 +130,17 @@ export class StartState extends Phaser.State {
         this.physics.arcade.collide(this.coins, this.platforms);
 
         if (this.player.isDead()) {
-            this.restartLevel();
+            this.gameOver();
         }
-
-        // TODO: Not a real usage, just for testing
-        this.addScore(1);
     }
 
     render() {
         // this.game.debug.spriteInfo(this.player, 32, 32);
+        // this.game.debug.body(this.player);
     }
 
-    restartLevel() {
-        this.state.restart();
+    gameOver() {
+        this.game.state.start('gameover', true, false, this.score);
     }
 
     addScore (amount) {
@@ -176,11 +166,16 @@ export class StartState extends Phaser.State {
         this.rope.body.immovable = true;
         this.rope.body.allowGravity = false;
         this.rope.sendToBack();
+        this.rope.inputEnabled = true;
+        this.rope.events.onInputDown.add(() => {
+            this.player.allowGrab = true;
+            this.physics.arcade.overlap(this.player, this.rope, (player) => player.onOverlapRope(true));
+        });
     }
 
     createWalls () {
         let leftWall = this.game.add.tileSprite(0, 0, 16, this.game.world.height, 'wall');
-        let rightWall = this.game.add.tileSprite(this.game.world.width, 0, 16, this.game.world.height, 'wall');
+        let rightWall = this.game.add.tileSprite(this.game.width, 0, 16, this.game.world.height, 'wall');
 
         this.walls = this.game.add.group();
         this.walls.enableBody = true; // Enable physics for the whole group
@@ -195,6 +190,25 @@ export class StartState extends Phaser.State {
         rightWall.body.allowGravity = false;
     }
 
+    createHUD () {
+        this.score = 0;
+        this.scoreLabel = this.game.add.bitmapText(this.game.width - 10, 10, 'carrier_command', `Score: ${pad(this.score)}`, 12);
+        this.scoreLabel.anchor.setTo(1, 0);
+        this.scoreLabel.fixedToCamera = true;
+
+        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
+        this.healthLabel.fixedToCamera = true;
+
+        this.healthIcons = this.game.add.group();
+        this.healthIcons.fixedToCamera = true;
+        for (let i = 0; i < this.player.maxHealth; i += 1) {
+            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
+            icon.anchor.setTo(0.5);
+            this.healthIcons.add(icon);
+        }
+        this.updateHealthHud();
+    }
+
     replaceRandomSpikes () {
         this.map.forEach(function (tile) {
             if (tile.index === 12) {
@@ -204,10 +218,22 @@ export class StartState extends Phaser.State {
     }
 
     generateWorldChunk(y) {
-        var mapChunk = this.mapPresets.data[this.game.rnd.integerInRange(0,2)];
-        var i = 0;
+        var preset   = this.game.rnd.integerInRange(0,2),
+            mapChunk = this.mapPresets[preset].layers[0].data,
+            i        = -1;
         this.map.forEach(function(tile) {
             tile.index = mapChunk[i++] - 1;
-        }, this, 0, y, 25, 20);
+        }, this, 0, y, 20, 20);
+
+        this.mapPresets[preset].layers[1].objects.forEach(function(object) {
+            switch(object.type) {
+                case 'bat':
+                    this.enemies.add(new Enemy(this.game, object.x, object.y + y*32));
+                    break;
+                case 'chest':
+                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32));
+                    break;
+            }
+        }, this);
     }
 }

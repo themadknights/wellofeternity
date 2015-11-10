@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="30">
+ <tileset firstgid="1" name="platform" tilewidth="32" tileheight="32" tilecount="18">
+  <image source="../images/platform.png" width="192" height="96"/>
+ </tileset>
+ <tileset firstgid="19" name="chest" tilewidth="64" tileheight="38" tilecount="2">
+  <image source="../images/chest.png" width="64" height="76"/>
+ </tileset>
+ <tileset firstgid="21" name="chest_small" tilewidth="32" tileheight="38" tilecount="2">
+  <image source="../images/chest_small.png" width="32" height="76"/>
+ </tileset>
+ <tileset firstgid="23" name="bat" tilewidth="50" tileheight="50" tilecount="1">
+  <tile id="0">
+   <image width="50" height="50" source="../images/bat.png"/>
+  </tile>
+ </tileset>
+ <layer name="Capa de Patrones 1" width="20" height="20">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,2,5,2,3,
+0,0,0,0,0,0,0,0,0,0,0,7,8,9,10,11,8,8,8,9,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,5,2,3,2,3,4,5,6,0,0,0,0,0,0,0,0,0,0,0,
+9,9,10,11,8,9,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,2,5,2,3,
+0,0,0,0,0,0,0,0,0,0,0,7,8,9,10,9,10,9,10,11,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,5,2,3,2,3,4,5,6,0,0,0,0,0,0,0,0,0,0,0,
+8,9,8,9,8,9,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,2,5,2,3,
+0,0,0,0,0,0,0,0,0,0,0,7,8,9,9,10,11,9,10,11,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="Capa de Objetos 1">
+  <object id="26" type="bat" gid="23" x="555" y="246" width="50" height="50"/>
+  <object id="27" type="bat" gid="23" x="30" y="374" width="50" height="50"/>
+  <object id="28" type="bat" gid="23" x="555" y="502" width="50" height="50"/>
+  <object id="29" type="bat" gid="23" x="30" y="118" width="50" height="50"/>
+ </objectgroup>
+</map>
