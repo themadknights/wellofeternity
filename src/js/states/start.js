@@ -23,11 +23,11 @@ export class StartState extends Phaser.State {
 
         //Enemies group
         this.enemies = this.game.add.group();
-        this.enemies.add(new Enemy(this.game, 200, 600));
+        this.enemies.add(new Enemy(this.game, 200, 640));
 
         //Chest group
         this.chests = this.game.add.group();
-        this.chests.add(new Chest(this.game, this, 448, 462));
+        this.chests.add(new Chest(this.game, this, 432, 480));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -37,7 +37,10 @@ export class StartState extends Phaser.State {
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Creating the map and its main layer, resizering the world to fix that layer
-        this.mapPresets = this.game.cache.getJSON('presets');
+        this.mapPresets = [];
+        for(i = 0; i < 3; i++) {
+            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
+        }
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 20, 100, 32, 32);
@@ -215,10 +218,22 @@ export class StartState extends Phaser.State {
     }
 
     generateWorldChunk(y) {
-        var mapChunk = this.mapPresets.data[this.game.rnd.integerInRange(0,2)];
-        var i = -1;
+        var preset   = this.game.rnd.integerInRange(0,2),
+            mapChunk = this.mapPresets[preset].layers[0].data,
+            i        = -1;
         this.map.forEach(function(tile) {
             tile.index = mapChunk[i++] - 1;
         }, this, 0, y, 20, 20);
+
+        this.mapPresets[preset].layers[1].objects.forEach(function(object) {
+            switch(object.type) {
+                case 'bat':
+                    this.enemies.add(new Enemy(this.game, object.x, object.y + y*32));
+                    break;
+                case 'chest':
+                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32));
+                    break;
+            }
+        }, this);
     }
 }

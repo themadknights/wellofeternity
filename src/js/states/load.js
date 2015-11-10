@@ -17,7 +17,9 @@ export class LoadState extends Phaser.State {
         this.load.image('coin', 'images/coin.png');
         this.load.image('hook', 'images/hook.png');
 
-        this.load.json('presets', 'json/presets.json');
+        this.load.json('preset01', 'json/preset01.json');
+        this.load.json('preset02', 'json/preset02.json');
+        this.load.json('preset03', 'json/preset03.json');
 
         this.load.spritesheet('health_icons', 'images/health_icons.png', 16, 16, 2);
     }
