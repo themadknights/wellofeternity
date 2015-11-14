@@ -27,11 +27,9 @@ export class StartState extends Phaser.State {
 
         //Enemies group
         this.enemies = this.game.add.group();
-        // this.enemies.add(new Enemy(this.game, 200, 640));
 
         //Chest group
         this.chests = this.game.add.group();
-        // this.chests.add(new Chest(this.game, this, 432, 480));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
@@ -42,27 +40,19 @@ export class StartState extends Phaser.State {
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.mapPresets = [];
-        this.mapPresets.push(this.game.cache.getJSON('presetTest01'));
-        // for(i = 0; i < 3; i++) {
-        //     this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
-        // }
+        // this.mapPresets.push(this.game.cache.getJSON('presetTest01'));
+        for(i = 0; i < 3; i++) {
+            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
+        }
         this.map = this.add.tilemap();
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 20, 100, 32, 32);
 
-        this.generateWorldChunk(10);
-
-        // for(i = 1; i < 5; i++) {
-        //     this.generateWorldChunk(20*i);
-        // }
+        for(i = 1; i < 5; i++) {
+            this.generateWorldChunk(20*i);
+        }
 
         this.map.setCollisionBetween(0, 5);
-
-        // //TODO: Example of platform, to be deleted when the map generation is done
-        // for(i = 0; i < 10; i++) {
-        //     this.map.putTile(i%6, 10+i, 15);
-        //     this.map.putTile(i%6+6, 10+i, 16);
-        // }
 
         //Spikes logic (Tiles: 99)
         this.map.setTileIndexCallback([12,13,14,15], function(player) {
@@ -73,11 +63,6 @@ export class StartState extends Phaser.State {
             }
         }, this);
 
-        // //TODO: Example of spikes, to be deleted when the map generation is done
-        // this.map.putTile(12, 15, 15);
-        // this.map.putTile(12, 16, 15);
-        // this.map.putTile(12, 18, 15);
-        // this.map.putTile(12, 10, 14);
         // //Replace 12 index for 12..15 randomly
         this.replaceRandomSpikes();
 
