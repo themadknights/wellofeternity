@@ -17,8 +17,6 @@ export class Map extends Phaser.Tilemap {
             this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
         }
 
-        this.setCollisionBetween(0, 5);
-
         //Spikes logic (Tiles: 99)
         this.setTileIndexCallback([12,13,14,15], function(player) {
             //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
@@ -64,5 +62,7 @@ export class Map extends Phaser.Tilemap {
                     break;
             }
         }, this);
+
+        this.setCollisionBetween(0, 5);
     }
 }
