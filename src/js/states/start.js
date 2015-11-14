@@ -1,6 +1,5 @@
-import { Chest } from './sprite/chest';
-import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
-import { PatrolEnemy } from './sprites/enemies/patrol_enemy';
+import { Map } from './map';
+import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
 import { pad } from './utils';
 
 export class StartState extends Phaser.State {
@@ -20,8 +19,6 @@ export class StartState extends Phaser.State {
     }
 
     create() {
-        var i;
-
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
@@ -38,48 +35,24 @@ export class StartState extends Phaser.State {
         //Player
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
-        //Creating the map and its main layer, resizering the world to fix that layer
-        this.mapPresets = [];
-        // this.mapPresets.push(this.game.cache.getJSON('presetTest01'));
-        for(i = 0; i < 3; i++) {
-            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
-        }
-        this.map = this.add.tilemap();
-        this.map.addTilesetImage('world');
-        this.platforms = this.map.create('platforms', 20, 100, 32, 32);
+        //Map
+        this.map = new Map(this.game, this);
 
-        for(i = 1; i < 5; i++) {
-            this.generateWorldChunk(20*i);
+        // TODO: generate a few chunks for testing purposes
+        for(let i = 1; i < 5; i++) {
+            this.map.generateWorldChunk(20*i);
         }
 
-        this.map.setCollisionBetween(0, 5);
+        //Replace 12 index for 12..15 randomly
+        this.map.replaceRandomSpikes();
 
-        //Spikes logic (Tiles: 99)
-        this.map.setTileIndexCallback([12,13,14,15], function(player) {
-            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-            if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
-                player.loseAllHealth();
-                // console.log(player.body.velocity.y);
-            }
-        }, this);
-
-        // //Replace 12 index for 12..15 randomly
-        this.replaceRandomSpikes();
-
-        //Goal logic (Tiles: 98)
-        this.map.setTileIndexCallback(98, function(player) {
-            // TODO: restart the level for now, same as player's death
-            if(player === this.player) {
-                this.gameOver();
-            }
-        }, this);
+        // Resize world after adding chunks
+        this.map.platforms.resizeWorld();
 
         //TODO: Example of goal, to be deleted when the map generation si done
-        for(i = 0; i < 20; i++) {
+        for(let i = 0; i < 20; i++) {
             this.map.putTile(98, i, 99);
         }
-
-        this.platforms.resizeWorld();
 
         // Add walls
         this.createWalls();
@@ -94,7 +67,7 @@ export class StartState extends Phaser.State {
     update() {
         this.physics.arcade.collide(this.player, this.walls);
 
-        this.physics.arcade.collide(this.player, this.platforms, function(player) {
+        this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
             //TODO: check deprecation when hook collide with tiles
             if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
                 player.grabHook();
@@ -105,7 +78,7 @@ export class StartState extends Phaser.State {
             }
         });
 
-        this.physics.arcade.collide(this.player.hook, this.platforms, () => {
+        this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
             this.player.onHookSet();
         });
 
@@ -120,7 +93,7 @@ export class StartState extends Phaser.State {
             }
         }, null, this);
 
-        this.physics.arcade.collide(this.coins, this.platforms);
+        this.physics.arcade.collide(this.coins, this.map.platforms);
 
         if (this.player.isDead()) {
             this.gameOver();
@@ -202,35 +175,6 @@ export class StartState extends Phaser.State {
             this.healthIcons.add(icon);
         }
         this.updateHealthHud();
-    }
-
-    replaceRandomSpikes () {
-        this.map.forEach(function (tile) {
-            if (tile.index === 12) {
-                tile.index = this.game.rnd.integerInRange(12, 15);
-            }
-        }, this);
-    }
-
-    generateWorldChunk(y) {
-        var preset   = this.game.rnd.integerInRange(0,this.mapPresets.length - 1),
-            mapChunk = this.mapPresets[preset].layers[0].data,
-            i        = -1;
-
-        this.map.forEach(function(tile) {
-            tile.index = mapChunk[i++] - 1;
-        }, this, 0, y, 20, 20);
-
-        this.mapPresets[preset].layers[1].objects.forEach(function(object) {
-            switch(object.type) {
-                case 'bat':
-                    this.enemies.add(new PatrolEnemy(this.game, object.x, object.y + y*32, object.properties));
-                    break;
-                case 'chest':
-                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32, object.properties));
-                    break;
-            }
-        }, this);
     }
 
     toggleDebug () {
