@@ -46,7 +46,7 @@ export class StartState extends Phaser.State {
         this.map.addTilesetImage('world');
         this.platforms = this.map.create('platforms', 20, 100, 32, 32);
 
-        this.generateWorldChunk(20);
+        this.generateWorldChunk(10);
 
         // for(i = 1; i < 5; i++) {
         //     this.generateWorldChunk(20*i);

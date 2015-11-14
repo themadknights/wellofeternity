@@ -152,12 +152,12 @@ export class Player extends Phaser.Sprite {
             this.health -= health;
             this.immune = true;
             let timer = this.game.time.create(this.game, true);
-            this.immunityTween = this.game.add.tween(this).to({ visible: false }, 0.01 * Phaser.Timer.SECOND, "Linear", true, 0, -1);
+            this.immunityTween = this.game.add.tween(this).to({ alpha: 0 }, 0.1 * Phaser.Timer.SECOND, "Linear", true, 0, -1);
             this.immunityTween.yoyo(true, 0);
             timer.add(2*Phaser.Timer.SECOND, function() {
                 this.game.tweens.remove(this.immunityTween);
                 this.immune = false;
-                this.visible = true;
+                this.alpha = 1;
             }, this);
             timer.start();
             this.gameState.updateHealthHud();
