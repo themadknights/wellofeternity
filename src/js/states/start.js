@@ -1,6 +1,6 @@
 import { Chest } from './sprite/chest';
 import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
-import { Enemy } from './sprites/enemy';
+import { PatrolEnemy } from './sprites/enemies/patrol_enemy';
 import { pad } from './utils';
 
 export class StartState extends Phaser.State {
@@ -13,6 +13,10 @@ export class StartState extends Phaser.State {
         this.physics.startSystem(Phaser.Physics.ARCADE);
         //Starting Gamepad Support
         this.input.gamepad.start();
+
+        //  Press F1 to toggle the debug display
+        this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
+        this.debugKey.onDown.add(this.toggleDebug, this);
     }
 
     create() {
@@ -139,8 +143,10 @@ export class StartState extends Phaser.State {
     }
 
     render() {
-        // this.game.debug.spriteInfo(this.player, 32, 32);
-        // this.game.debug.body(this.player);
+        if (this.showDebug) {
+            this.game.debug.body(this.player);
+            this.enemies.forEach((enemy) => this.game.debug.body(enemy));
+        }
     }
 
     gameOver() {
@@ -233,12 +239,16 @@ export class StartState extends Phaser.State {
         this.mapPresets[preset].layers[1].objects.forEach(function(object) {
             switch(object.type) {
                 case 'bat':
-                    this.enemies.add(new Enemy(this.game, object.x, object.y + y*32));
+                    this.enemies.add(new PatrolEnemy(this.game, object.x, object.y + y*32, object.properties));
                     break;
                 case 'chest':
-                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32));
+                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32, object.properties));
                     break;
             }
         }, this);
+    }
+
+    toggleDebug () {
+        this.showDebug = (this.showDebug) ? false : true;
     }
 }

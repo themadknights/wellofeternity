@@ -31,6 +31,11 @@
 </data>
  </layer>
  <objectgroup name="Object Layer 1">
-  <object id="1" type="bat" gid="19" x="512" y="320" width="50" height="50"/>
+  <object id="1" type="bat" gid="19" x="512" y="320" width="50" height="50">
+   <properties>
+    <property name="maxDistance" value="100"/>
+    <property name="speed" value="-50"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

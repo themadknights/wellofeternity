@@ -13,7 +13,7 @@
         }, 
         {
          "draworder":"topdown",
-         "height":20,
+         "height":0,
          "name":"Object Layer 1",
          "objects":[
                 {
@@ -23,7 +23,8 @@
                  "name":"",
                  "properties":
                     {
-
+                     "maxDistance":"100",
+                     "speed":"-50"
                     },
                  "rotation":0,
                  "type":"bat",
@@ -35,7 +36,7 @@
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
-         "width":20,
+         "width":0,
          "x":0,
          "y":0
         }],
