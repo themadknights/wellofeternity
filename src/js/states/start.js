@@ -1,5 +1,6 @@
 import { Map } from './map';
 import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
+import { WallTrap } from './sprites/walltrap';
 import { pad } from './utils';
 
 export class StartState extends Phaser.State {
@@ -31,6 +32,13 @@ export class StartState extends Phaser.State {
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
         this.coins.enableBody = true;
+
+        //Wall trap group
+        this.traps = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.traps.add(new WallTrap(this.game, this, 200));
+        this.traps.add(new WallTrap(this.game, this, 300));
+        this.traps.add(new WallTrap(this.game, this, 400));
+        this.traps.add(new WallTrap(this.game, this, 500));
 
         //Player
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
@@ -104,6 +112,7 @@ export class StartState extends Phaser.State {
         if (this.showDebug) {
             this.game.debug.body(this.player);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
+            this.traps.forEach((trap) => this.game.debug.body(trap));
         }
     }
 
