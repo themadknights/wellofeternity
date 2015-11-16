@@ -6,6 +6,7 @@ export class Weapon extends Phaser.Sprite {
         this.game.physics.arcade.enable(this);
         this.body.allowGravity = false;
         this.game.add.existing(this);
+        this.attackDamage = 1;
         this.owner = owner;
         this.visible = false;
         this.attackAnimation = this.animations.add('attack');
@@ -18,7 +19,7 @@ export class Weapon extends Phaser.Sprite {
 
     attack() {
         this.visible = true;
-        this.attackAnimation.play(10);
+        this.attackAnimation.play(12);
         this.attackAnimation.onComplete.add(() => this.visible = false);
     }
 }

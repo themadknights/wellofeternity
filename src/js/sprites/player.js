@@ -34,7 +34,7 @@ export class Player extends Phaser.Sprite {
         }
         this.allowJump = true;
         this.allowGrab = true;
-        this.immune = false;
+        this.invulnerable = false;
 
         // Create hook and hook rope
         this.createHook();
@@ -162,16 +162,16 @@ export class Player extends Phaser.Sprite {
         (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1);
     }
 
-    loseHealth(health) {
-        if(!this.immune) {
-            this.health -= health;
-            this.immune = true;
+    damage(amount) {
+        if(!this.invulnerable) {
+            this.health -= amount;
+            this.invulnerable = true;
             let timer = this.game.time.create(this.game, true);
             this.immunityTween = this.game.add.tween(this).to({ alpha: 0 }, 0.1 * Phaser.Timer.SECOND, "Linear", true, 0, -1);
             this.immunityTween.yoyo(true, 0);
             timer.add(2*Phaser.Timer.SECOND, function() {
                 this.game.tweens.remove(this.immunityTween);
-                this.immune = false;
+                this.invulnerable = false;
                 this.alpha = 1;
             }, this);
             timer.start();
@@ -180,7 +180,7 @@ export class Player extends Phaser.Sprite {
     }
 
     loseAllHealth() {
-        this.loseHealth(this.health);
+        this.damage(this.health);
     }
 
     isDead() {
