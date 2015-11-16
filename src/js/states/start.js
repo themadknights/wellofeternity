@@ -86,6 +86,12 @@ export class StartState extends Phaser.State {
             player.loseHealth(enemy.damage);
         });
 
+        this.physics.arcade.overlap(this.player.weapon, this.enemies, (weapon, enemy) => {
+            if (weapon.visible) {
+                enemy.kill();
+            }
+        });
+
         this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
             if(coin.allowedPickup) {
                 coin.kill();

@@ -9,8 +9,11 @@ const PLAYER_STATE_GROUND = 1;
 const PLAYER_STATE_JUMPING = 2;
 const PLAYER_STATE_FALLING = 3;
 const PLAYER_STATE_GRABBING_THE_ROPE = 4;
+const PLAYER_STATE_ATTACKING = 5;
 export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
+
+import { Weapon } from './sprites/weapon';
 
 export class Player extends Phaser.Sprite {
 
@@ -36,11 +39,14 @@ export class Player extends Phaser.Sprite {
         // Create hook and hook rope
         this.createHook();
 
+        this.weapon = new Weapon(this.game, this, 'machete');
+
         this.wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     }
 
     update() {
-        if (this.state !== PLAYER_STATE_GRABBING_THE_HOOK) {
+        if (this.state !== PLAYER_STATE_GRABBING_THE_HOOK && this.state !== PLAYER_STATE_ATTACKING) {
             //Checking Input
             this.body.velocity.x = 0;
 
@@ -82,6 +88,11 @@ export class Player extends Phaser.Sprite {
                 this.game.physics.arcade.moveToPointer(this.hook, 800);
             }
 
+            // Attack with a weapon
+            if(this.isAttacking() && !this.weapon.visible) {
+                this.weapon.attack();
+            }
+
             this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
             this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
 
@@ -117,6 +128,10 @@ export class Player extends Phaser.Sprite {
 
     isShootingHook() {
         return this.game.input.activePointer.isDown;
+    }
+
+    isAttacking() {
+        return this.spaceKey.isDown;
     }
 
     onOverlapRope(inputDownOnRope = false) {
@@ -208,5 +223,10 @@ export class Player extends Phaser.Sprite {
         this.rope.moveTo(this.line.start.x, this.line.start.y);
         this.rope.lineTo(this.line.end.x, this.line.end.y);
         this.rope.endFill();
+    }
+
+    attack() {
+        this.state = PLAYER_STATE_ATTACKING;
+        this.weapon.attack();
     }
 }
