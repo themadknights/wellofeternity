@@ -19,7 +19,7 @@ export class WallTrap extends Phaser.Sprite {
                 projectile.reset(this.x, this.y + this.height/2);
             } else {
                 projectile = this.gameState.projectiles.create(this.x, this.y + this.height/2, 'projectile');
-                projectile.damage = 1;
+                projectile.attackDamage = 1;
                 projectile.anchor.setTo(0.5);
             }
             projectile.body.allowGravity = false;
