@@ -4,7 +4,9 @@ export class PatrolEnemy extends Enemy {
     constructor(game, x, y, data) {
         data.speed = data.speed || -200;
         data.maxDistance = data.maxDistance || 150;
-        super(game, x, y, data.damage);
+        data.attackDamage = data.attackDamage || 1;
+        data.health = data.health || 2;
+        super(game, x, y, data);
         this.body.velocity.x = data.speed;
         this.maxDistance = data.maxDistance;
         this.startPositionX = this.position.x;
