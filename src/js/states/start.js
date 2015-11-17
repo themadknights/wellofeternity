@@ -106,6 +106,11 @@ export class StartState extends Phaser.State {
             }
         }, null, this);
 
+        this.physics.arcade.overlap(this.player, this.projectiles, function(player, projectile) {
+            player.loseHealth(1);
+            projectile.kill();
+        });
+
         this.physics.arcade.collide(this.coins, this.map.platforms);
 
         if (this.player.isDead()) {
