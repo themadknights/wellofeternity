@@ -33,8 +33,9 @@ export class StartState extends Phaser.State {
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
         this.coins.enableBody = true;
 
-        //Wall trap group
+        //Wall trap and projectile group
         this.traps = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.projectiles = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
         this.traps.add(new WallTrap(this.game, this, 200));
         this.traps.add(new WallTrap(this.game, this, 300));
         this.traps.add(new WallTrap(this.game, this, 400));
@@ -84,6 +85,10 @@ export class StartState extends Phaser.State {
             if(player.tooFast) {
                 player.loseAllHealth();
             }
+        });
+
+        this.physics.arcade.overlap(this.player, this.traps, function(player, trap) {
+            trap.fire();
         });
 
         this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
