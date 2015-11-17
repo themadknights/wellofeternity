@@ -98,6 +98,9 @@ export class StartState extends Phaser.State {
         if (this.player.isDead()) {
             this.gameOver();
         }
+
+        this.background.autoScroll(0, (this.cameraLastPositionY - this.camera.position.y) * 20);
+        this.cameraLastPositionY = this.camera.position.y;
     }
 
     render() {
@@ -123,8 +126,10 @@ export class StartState extends Phaser.State {
     }
 
     createBackground () {
-        this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
+        this.background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
         this.background.sendToBack();
+        this.background.fixedToCamera = true;
+        this.cameraLastPositionY = this.camera.position.y;
     }
 
     createRope () {
