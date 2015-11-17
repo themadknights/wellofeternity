@@ -107,7 +107,7 @@ export class StartState extends Phaser.State {
         }, null, this);
 
         this.physics.arcade.overlap(this.player, this.projectiles, function(player, projectile) {
-            player.loseHealth(1);
+            player.loseHealth(projectile.damage);
             projectile.kill();
         });
 
