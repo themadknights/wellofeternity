@@ -38,6 +38,7 @@ export class Player extends Phaser.Sprite {
 
         //Creating animations
         this.animations.add('movement', [4, 5, 6, 7], 10, true);
+        this.animations.add('jump', [8, 9, 10, 11], 6, false);
 
         // Create hook and hook rope
         this.createHook();
@@ -67,14 +68,17 @@ export class Player extends Phaser.Sprite {
                 this.moving = true;
             }
 
-            if(this.moving) {
-                this.play('movement');
-            } else {
-                this.animations.stop();
-                this.frame = 0;
+            if(this.body.velocity.y >= 0) {
+                if(this.moving) {
+                    this.play('movement');
+                } else {
+                    this.animations.stop();
+                    this.frame = 0;
+                }
             }
             if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
                 if (this.canJump() && this.isJumping()) {
+                    this.play('jump');
                     this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
                     this.allowGrab = false;
                     this.wKey.onUp.addOnce(() => this.allowGrab = true);
