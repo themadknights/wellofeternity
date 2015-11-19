@@ -1,5 +1,5 @@
 const PLAYER_MAX_HEALTH = 3;
-const PLAYER_FALL_SPEED_LIMIT = 1000;
+const PLAYER_FALL_SPEED_LIMIT = 600;
 const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
 const PLAYER_JUMP_SWIPE_THRESHOLD = 50;
@@ -39,6 +39,8 @@ export class Player extends Phaser.Sprite {
         //Creating animations
         this.animations.add('movement', [4, 5, 6, 7], 10, true);
         this.animations.add('jump', [8, 9, 10, 11], 6, false);
+        this.animations.add('fall', [12, 13], 5, true);
+        this.animations.add('hardfall', [16, 17], 5, true);
 
         // Create hook and hook rope
         this.createHook();
@@ -68,14 +70,6 @@ export class Player extends Phaser.Sprite {
                 this.moving = true;
             }
 
-            if(this.body.velocity.y >= 0) {
-                if(this.moving) {
-                    this.play('movement');
-                } else {
-                    this.animations.stop();
-                    this.frame = 0;
-                }
-            }
             if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
                 if (this.canJump() && this.isJumping()) {
                     this.play('jump');
@@ -91,10 +85,19 @@ export class Player extends Phaser.Sprite {
             } else if(this.body.velocity.y > 0) {
                 if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
                     this.tooFast = true;
+                    this.play('hardfall');
+                } else {
+                    this.play('fall');
                 }
                 this.state = PLAYER_STATE_FALLING;
             } else if (this.body.blocked.down) {
                 this.state = PLAYER_STATE_GROUND;
+                if(this.moving) {
+                    this.play('movement');
+                } else {
+                    this.animations.stop();
+                    this.frame = 0;
+                }
             }
 
             // Shoot hook
@@ -152,6 +155,9 @@ export class Player extends Phaser.Sprite {
 
     onOverlapRope(inputDownOnRope = false) {
         if (this.allowGrab && this.state !== PLAYER_STATE_GRABBING_THE_ROPE && (inputDownOnRope || this.isGrabbingTheRope())) {
+            this.animations.stop();
+            this.frame = 0;
+            this.tooFast = false;
             this.state = PLAYER_STATE_GRABBING_THE_ROPE;
             this.position.x = this.gameState.rope.x;
             this.disableGravity();
@@ -218,6 +224,9 @@ export class Player extends Phaser.Sprite {
     }
 
     onHookSet () {
+        this.animations.stop();
+        this.frame = 0;
+        this.tooFast = false;
         this.disableGravity();
         this.hook.body.velocity.setTo(0);
         this.game.physics.arcade.moveToObject(this, this.hook, 800);
