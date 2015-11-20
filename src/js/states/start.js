@@ -1,6 +1,6 @@
-import { Chest } from './sprite/chest';
-import { Player, PLAYER_SPIKE_VELOCITY, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
-import { Enemy } from './sprites/enemy';
+import { Map } from './map';
+import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
+import { WallTrap } from './sprites/walltrap';
 import { pad } from './utils';
 
 export class StartState extends Phaser.State {
@@ -13,80 +13,55 @@ export class StartState extends Phaser.State {
         this.physics.startSystem(Phaser.Physics.ARCADE);
         //Starting Gamepad Support
         this.input.gamepad.start();
+
+        //  Press F1 to toggle the debug display
+        this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
+        this.debugKey.onDown.add(this.toggleDebug, this);
     }
 
     create() {
-        var i;
-
         //Creating gravity
         this.physics.arcade.gravity.y = 300;
 
         //Enemies group
         this.enemies = this.game.add.group();
-        this.enemies.add(new Enemy(this.game, 200, 640));
 
         //Chest group
         this.chests = this.game.add.group();
-        this.chests.add(new Chest(this.game, this, 432, 480));
 
         //Coins group
         this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
         this.coins.enableBody = true;
 
+        //Wall trap and projectile group
+        this.traps = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.projectiles = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
+        this.traps.add(new WallTrap(this.game, this, 200));
+        this.traps.add(new WallTrap(this.game, this, 300));
+        this.traps.add(new WallTrap(this.game, this, 400));
+        this.traps.add(new WallTrap(this.game, this, 500));
+
         //Player
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
-        //Creating the map and its main layer, resizering the world to fix that layer
-        this.mapPresets = [];
-        for(i = 0; i < 3; i++) {
-            this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
-        }
-        this.map = this.add.tilemap();
-        this.map.addTilesetImage('world');
-        this.platforms = this.map.create('platforms', 20, 100, 32, 32);
-        for(i = 1; i < 5; i++) {
-            this.generateWorldChunk(20*i);
+        //Map
+        this.map = new Map(this.game, this);
+
+        // TODO: generate a few chunks for testing purposes
+        for(let i = 1; i < 5; i++) {
+            this.map.generateWorldChunk(20*i);
         }
 
-        this.map.setCollisionBetween(0, 5);
-
-        //TODO: Example of platform, to be deleted when the map generation is done
-        for(i = 0; i < 10; i++) {
-            this.map.putTile(i%6, 10+i, 15);
-            this.map.putTile(i%6+6, 10+i, 16);
-        }
-
-        //Spikes logic (Tiles: 99)
-        this.map.setTileIndexCallback([12,13,14,15], function(player) {
-            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-            if(player === this.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
-                player.loseAllHealth();
-                // console.log(player.body.velocity.y);
-            }
-        }, this);
-
-        //TODO: Example of spikes, to be deleted when the map generation is done
-        this.map.putTile(12, 15, 15);
-        this.map.putTile(12, 16, 15);
-        this.map.putTile(12, 18, 15);
-        this.map.putTile(12, 10, 14);
         //Replace 12 index for 12..15 randomly
-        this.replaceRandomSpikes();
+        this.map.replaceRandomSpikes();
 
-        //Goal logic (Tiles: 98)
-        this.map.setTileIndexCallback(98, function(player) {
-            // TODO: restart the level for now, same as player's death
-            if(player === this.player) {
-                this.gameOver();
-            }
-        }, this);
+        // Resize world after adding chunks
+        this.map.platforms.resizeWorld();
 
         //TODO: Example of goal, to be deleted when the map generation si done
-        for(i = 0; i < 20; i++) {
+        for(let i = 0; i < 20; i++) {
             this.map.putTile(98, i, 99);
         }
-
-        this.platforms.resizeWorld();
 
         // Add walls
         this.createWalls();
@@ -101,7 +76,7 @@ export class StartState extends Phaser.State {
     update() {
         this.physics.arcade.collide(this.player, this.walls);
 
-        this.physics.arcade.collide(this.player, this.platforms, function(player) {
+        this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
             //TODO: check deprecation when hook collide with tiles
             if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
                 player.grabHook();
@@ -112,12 +87,22 @@ export class StartState extends Phaser.State {
             }
         });
 
-        this.physics.arcade.collide(this.player.hook, this.platforms, () => {
+        this.physics.arcade.overlap(this.player, this.traps, function(player, trap) {
+            trap.fire();
+        });
+
+        this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
             this.player.onHookSet();
         });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
-            player.loseHealth(enemy.damage);
+            player.damage(enemy.attackDamage);
+        });
+
+        this.physics.arcade.overlap(this.player.weapon, this.enemies, (weapon, enemy) => {
+            if (weapon.visible) {
+                enemy.damage(weapon.attackDamage);
+            }
         });
 
         this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
@@ -127,16 +112,27 @@ export class StartState extends Phaser.State {
             }
         }, null, this);
 
-        this.physics.arcade.collide(this.coins, this.platforms);
+        this.physics.arcade.overlap(this.player, this.projectiles, function(player, projectile) {
+            player.damage(projectile.attackDamage);
+            projectile.kill();
+        });
+
+        this.physics.arcade.collide(this.coins, this.map.platforms);
 
         if (this.player.isDead()) {
             this.gameOver();
         }
+
+        this.background.autoScroll(0, (this.cameraLastPositionY - this.camera.position.y) * 20);
+        this.cameraLastPositionY = this.camera.position.y;
     }
 
     render() {
-        // this.game.debug.spriteInfo(this.player, 32, 32);
-        // this.game.debug.body(this.player);
+        if (this.showDebug) {
+            this.game.debug.body(this.player);
+            this.enemies.forEach((enemy) => this.game.debug.body(enemy));
+            this.traps.forEach((trap) => this.game.debug.body(trap));
+        }
     }
 
     gameOver() {
@@ -155,8 +151,10 @@ export class StartState extends Phaser.State {
     }
 
     createBackground () {
-        this.background = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'background');
+        this.background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
         this.background.sendToBack();
+        this.background.fixedToCamera = true;
+        this.cameraLastPositionY = this.camera.position.y;
     }
 
     createRope () {
@@ -209,31 +207,7 @@ export class StartState extends Phaser.State {
         this.updateHealthHud();
     }
 
-    replaceRandomSpikes () {
-        this.map.forEach(function (tile) {
-            if (tile.index === 12) {
-                tile.index = this.game.rnd.integerInRange(12, 15);
-            }
-        }, this);
-    }
-
-    generateWorldChunk(y) {
-        var preset   = this.game.rnd.integerInRange(0,2),
-            mapChunk = this.mapPresets[preset].layers[0].data,
-            i        = -1;
-        this.map.forEach(function(tile) {
-            tile.index = mapChunk[i++] - 1;
-        }, this, 0, y, 20, 20);
-
-        this.mapPresets[preset].layers[1].objects.forEach(function(object) {
-            switch(object.type) {
-                case 'bat':
-                    this.enemies.add(new Enemy(this.game, object.x, object.y + y*32));
-                    break;
-                case 'chest':
-                    this.chests.add(new Chest(this.game, this, object.x, object.y + y*32));
-                    break;
-            }
-        }, this);
+    toggleDebug () {
+        this.showDebug = (this.showDebug) ? false : true;
     }
 }
