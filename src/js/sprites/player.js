@@ -40,6 +40,10 @@ export class Player extends Phaser.Sprite {
         this.animations.add('fall', [12, 13], 5, true);
         this.animations.add('hardfall', [16, 17], 5, true);
 
+        //Creating sounds
+        this.jumpFx = this.game.add.audio('jumpFx');
+        this.jumpFx.volume = 0.1;
+
         // Create hook and hook rope
         this.createHook();
 
@@ -71,6 +75,7 @@ export class Player extends Phaser.Sprite {
             if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
                 if (this.canJump() && this.isJumping()) {
                     this.play('jump');
+                    this.jumpFx.play();
                     this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
                     this.allowGrab = false;
                     this.wKey.onUp.addOnce(() => this.allowGrab = true);

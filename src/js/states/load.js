@@ -25,6 +25,8 @@ export class LoadState extends Phaser.State {
         this.load.json('preset02', 'json/preset02.json');
         this.load.json('preset03', 'json/preset03.json');
 
+        this.load.audio('jumpFx', 'sounds/jump.wav');
+
         this.load.spritesheet('health_icons', 'images/health_icons.png', 16, 16, 2);
     }
 
