@@ -8,9 +8,6 @@ export class Chest extends Phaser.Sprite {
         this.opened = false;
         this.body.allowGravity = false;
         this.inputEnabled = true;
-        this.events.onInputDown.add(() => {
-            this.gameState.physics.arcade.overlap(this.gameState.player, this, (player) => player.onOverlapChest(this, true));
-        });
     }
 
     open () {
