@@ -165,10 +165,6 @@ export class StartState extends Phaser.State {
         this.rope.body.allowGravity = false;
         this.rope.sendToBack();
         this.rope.inputEnabled = true;
-        this.rope.events.onInputDown.add(() => {
-            this.player.allowGrab = true;
-            this.physics.arcade.overlap(this.player, this.rope, (player) => player.onOverlapRope(true));
-        });
     }
 
     createWalls () {

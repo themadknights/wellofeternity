@@ -2,8 +2,6 @@ const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 600;
 const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
-const PLAYER_JUMP_SWIPE_THRESHOLD = 50;
-const PLAYER_MOVE_TOUCH_THRESHOLD = 20;
 const PLAYER_STATE_IDLE = 0;
 const PLAYER_STATE_GROUND = 1;
 const PLAYER_STATE_JUMPING = 2;
@@ -125,24 +123,24 @@ export class Player extends Phaser.Sprite {
         }
     }
 
+    //TODO: Rethink mobile input
     isMovingLeft() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
-        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x < this.position.x && Math.abs( this.game.input.activePointer.position.x - this.position.x) > PLAYER_MOVE_TOUCH_THRESHOLD;
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
     }
 
+    //TODO: Rethink mobile input
     isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) ||
-        this.game.input.activePointer.isDown && this.game.input.activePointer.position.x > this.position.x && Math.abs( this.game.input.activePointer.position.x - this.position.x) > PLAYER_MOVE_TOUCH_THRESHOLD;
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
     }
 
     canJump() {
         return this.body.blocked.down && this.allowJump;
     }
 
+    //TODO: Rethink mobile input
     isJumping() {
         return this.wKey.isDown || this.pad &&
-        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) ||
-        this.game.input.activePointer.isDown && this.game.input.activePointer.position.y - this.game.input.activePointer.positionDown.y < -PLAYER_JUMP_SWIPE_THRESHOLD;
+        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1);
     }
 
     isShootingHook() {
