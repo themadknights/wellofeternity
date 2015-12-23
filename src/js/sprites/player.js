@@ -45,6 +45,8 @@ export class Player extends Phaser.Sprite {
         this.jumpFx.volume = 0.1;
         this.floorFx = this.game.add.audio('floorFx');
         this.floorFx.volume = 0.1;
+        this.stepFx = this.game.add.audio('stepFx', true);
+        this.stepFx.volume = 0.05;
 
         // Create hook and hook rope
         this.createHook();
@@ -99,8 +101,12 @@ export class Player extends Phaser.Sprite {
                 this.state = PLAYER_STATE_GROUND;
                 if(this.moving) {
                     this.play('movement');
+                    if(!this.stepFx.isPlaying) {
+                        this.stepFx.play();
+                    }
                 } else {
                     this.animations.stop();
+                    this.stepFx.stop();
                     this.frame = 0;
                 }
             }

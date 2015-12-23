@@ -27,6 +27,7 @@ export class LoadState extends Phaser.State {
 
         this.load.audio('jumpFx', 'sounds/jump.wav');
         this.load.audio('floorFx', 'sounds/floor.wav');
+        this.load.audio('stepFx', 'sounds/step.wav');
 
         this.load.spritesheet('health_icons', 'images/health_icons.png', 16, 16, 2);
     }
