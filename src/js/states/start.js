@@ -81,7 +81,7 @@ export class StartState extends Phaser.State {
             if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
                 player.grabHook();
             }
-
+            player.landing();
             if(player.tooFast) {
                 player.loseAllHealth();
             }
@@ -132,6 +132,7 @@ export class StartState extends Phaser.State {
             this.game.debug.body(this.player);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
             this.traps.forEach((trap) => this.game.debug.body(trap));
+            this.game.debug.text(`Player gravity: ${this.player.body.velocity.y}`, 50, 50);
         }
     }
 

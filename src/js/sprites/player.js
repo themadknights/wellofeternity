@@ -43,6 +43,8 @@ export class Player extends Phaser.Sprite {
         //Creating sounds
         this.jumpFx = this.game.add.audio('jumpFx');
         this.jumpFx.volume = 0.1;
+        this.floorFx = this.game.add.audio('floorFx');
+        this.floorFx.volume = 0.1;
 
         // Create hook and hook rope
         this.createHook();
@@ -256,5 +258,11 @@ export class Player extends Phaser.Sprite {
     attack() {
         this.state = PLAYER_STATE_ATTACKING;
         this.weapon.attack();
+    }
+
+    landing() {
+        if(this.state === PLAYER_STATE_FALLING && this.body.onFloor()) {
+            this.floorFx.play();
+        }
     }
 }
