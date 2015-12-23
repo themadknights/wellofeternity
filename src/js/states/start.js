@@ -75,10 +75,7 @@ export class StartState extends Phaser.State {
 
     update() {
         this.physics.arcade.collide(this.player, this.walls, function(player) {
-            if(player.body.velocity.y >= 0) {
-                player.allowGravity = false;
-                player.body.velocity.y = 100;
-            }
+            player.slide();
         });
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
