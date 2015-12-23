@@ -17,6 +17,13 @@ gulp.task('images', function () {
         .pipe($.connect.reload());
 });
 
+gulp.task('sounds', function () {
+    gulp.src(config.files.sounds)
+        .pipe($.plumber())
+        .pipe(gulp.dest(config.sounds.destFolder))
+        .pipe($.connect.reload());
+});
+
 gulp.task('json', function () {
     gulp.src(config.files.json)
         .pipe($.plumber())
@@ -60,13 +67,14 @@ gulp.task('scripts', function () {
         .pipe($.connect.reload());
 });
 
-gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images','json', 'fonts']);
+gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images', 'sounds', 'json', 'fonts']);
 
 gulp.task('watch', ['build'], function () {
     gulp.watch(config.files.scripts, ['scripts']);
     gulp.watch(config.files.templates, ['templates']);
     gulp.watch(config.files.styles, ['styles']);
     gulp.watch(config.files.images, ['images']);
+    gulp.watch(config.files.sounds, ['sounds']);
     gulp.watch(config.files.json, ['json']);
     gulp.watch(config.files.fonts, ['fonts']);
 });
