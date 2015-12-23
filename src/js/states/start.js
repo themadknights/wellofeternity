@@ -74,7 +74,12 @@ export class StartState extends Phaser.State {
     }
 
     update() {
-        this.physics.arcade.collide(this.player, this.walls);
+        this.physics.arcade.collide(this.player, this.walls, function(player) {
+            if(player.body.velocity.y >= 0) {
+                player.allowGravity = false;
+                player.body.velocity.y = 100;
+            }
+        });
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
             //TODO: check deprecation when hook collide with tiles
@@ -132,6 +137,7 @@ export class StartState extends Phaser.State {
             this.game.debug.body(this.player);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
             this.traps.forEach((trap) => this.game.debug.body(trap));
+            this.game.debug.text(`Player gravity: ${this.player.body.velocity.y}`, 50, 50);
         }
     }
 
