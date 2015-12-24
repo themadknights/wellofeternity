@@ -8,6 +8,7 @@ const PLAYER_STATE_JUMPING = 2;
 const PLAYER_STATE_FALLING = 3;
 const PLAYER_STATE_GRABBING_THE_ROPE = 4;
 const PLAYER_STATE_ATTACKING = 5;
+const PLAYER_SLIDE_VELOCITY = 100;
 export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
@@ -251,5 +252,12 @@ export class Player extends Phaser.Sprite {
     attack() {
         this.state = PLAYER_STATE_ATTACKING;
         this.weapon.attack();
+    }
+
+    slide() {
+        if(this.body.velocity.y >= 0) {
+            this.allowGravity = false;
+            this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
+        }
     }
 }
