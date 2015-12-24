@@ -41,6 +41,14 @@ export class Player extends Phaser.Sprite {
         this.animations.add('fall', [12, 13], 5, true);
         this.animations.add('hardfall', [16, 17], 5, true);
 
+        //Creating sounds
+        this.jumpFx = this.game.add.audio('jumpFx');
+        this.jumpFx.volume = 0.1;
+        this.floorFx = this.game.add.audio('floorFx');
+        this.floorFx.volume = 0.1;
+        this.stepFx = this.game.add.audio('stepFx', true);
+        this.stepFx.volume = 0.05;
+
         // Create hook and hook rope
         this.createHook();
 
@@ -72,6 +80,7 @@ export class Player extends Phaser.Sprite {
             if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
                 if (this.canJump() && this.isJumping()) {
                     this.play('jump');
+                    this.jumpFx.play();
                     this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
                     this.allowGrab = false;
                     this.wKey.onUp.addOnce(() => this.allowGrab = true);
@@ -93,8 +102,12 @@ export class Player extends Phaser.Sprite {
                 this.state = PLAYER_STATE_GROUND;
                 if(this.moving) {
                     this.play('movement');
+                    if(!this.stepFx.isPlaying) {
+                        this.stepFx.play();
+                    }
                 } else {
                     this.animations.stop();
+                    this.stepFx.stop();
                     this.frame = 0;
                 }
             }
@@ -258,6 +271,12 @@ export class Player extends Phaser.Sprite {
         if(this.body.velocity.y >= 0) {
             this.allowGravity = false;
             this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
+        }
+    }
+
+    landing() {
+        if(this.state === PLAYER_STATE_FALLING && this.body.onFloor()) {
+            this.floorFx.play();
         }
     }
 }

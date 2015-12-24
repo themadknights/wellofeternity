@@ -83,7 +83,7 @@ export class StartState extends Phaser.State {
             if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
                 player.grabHook();
             }
-
+            player.landing();
             if(player.tooFast) {
                 player.loseAllHealth();
             }
