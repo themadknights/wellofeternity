@@ -11,8 +11,6 @@ export class StartState extends Phaser.State {
     init() {
         //Starting Physics
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        //Starting Gamepad Support
-        this.input.gamepad.start();
 
         //  Press F1 to toggle the debug display
         this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
