@@ -27,10 +27,6 @@ export class Player extends Phaser.Sprite {
         this.maxHealth = PLAYER_MAX_HEALTH;
         this.health = this.maxHealth;
         this.tooFast = false;
-        //Adding gamepad controller
-        if(this.game.input.gamepad.supported && this.game.input.gamepad.active && this.game.input.gamepad.pad1.connected) {
-            this.pad = this.game.input.gamepad.pad1;
-        }
         this.allowJump = true;
         this.allowGrab = true;
         this.invulnerable = false;
@@ -137,24 +133,20 @@ export class Player extends Phaser.Sprite {
         }
     }
 
-    //TODO: Rethink mobile input
     isMovingLeft() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.A) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.A);
     }
 
-    //TODO: Rethink mobile input
     isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.D) || this.pad && (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1);
+        return this.game.input.keyboard.isDown(Phaser.KeyCode.D);
     }
 
     canJump() {
         return this.body.blocked.down && this.allowJump;
     }
 
-    //TODO: Rethink mobile input
     isJumping() {
-        return this.wKey.isDown || this.pad &&
-        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1);
+        return this.wKey.isDown;
     }
 
     isShootingHook() {
@@ -192,8 +184,7 @@ export class Player extends Phaser.Sprite {
     }
 
     isGrabbingTheRope() {
-        return this.wKey.isDown || this.pad &&
-        (this.pad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1);
+        return this.wKey.isDown;
     }
 
     damage(amount) {
