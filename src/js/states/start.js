@@ -118,6 +118,7 @@ export class StartState extends Phaser.State {
         });
 
         this.physics.arcade.collide(this.coins, this.map.platforms);
+        this.physics.arcade.collide(this.coins, this.walls);
 
         if (this.player.isDead()) {
             this.gameOver();

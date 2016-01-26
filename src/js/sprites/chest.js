@@ -23,9 +23,9 @@ export class Chest extends Phaser.Sprite {
         for(let i = 0; i < n; i++) {
             let coin = this.gameState.coins.getFirstExists(false);
             if(coin) {
-                coin.reset(this.x, this.y);
+                coin.reset(this.x + this.width/2, this.y);
             } else {
-                coin = this.gameState.coins.create(this.x, this.y, 'coin');
+                coin = this.gameState.coins.create(this.x + this.width/2, this.y, 'coin');
                 coin.anchor.setTo(0.5);
             }
             coin.allowedPickup = false;
