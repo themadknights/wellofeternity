@@ -61,6 +61,9 @@ export class StartState extends Phaser.State {
             this.map.putTile(98, i, 99);
         }
 
+        //Add sounds
+        this.coinFx = this.game.add.audio('coinFx');
+        this.coinFx.volume = 0.1;
         // Add walls
         this.createWalls();
         // Add rope to the back of the scene but in front background
@@ -107,6 +110,7 @@ export class StartState extends Phaser.State {
 
         this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
             if(coin.allowedPickup) {
+                this.coinFx.play();
                 coin.kill();
                 this.addScore(100);
             }
