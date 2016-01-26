@@ -136,6 +136,7 @@ export class StartState extends Phaser.State {
         if (this.showDebug) {
             this.game.debug.body(this.player);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
+            this.coins.forEach((coin) => this.game.debug.body(coin));
             this.traps.forEach((trap) => this.game.debug.body(trap));
             this.game.debug.text(`Player gravity: ${this.player.body.velocity.y}`, 50, 50);
         }

@@ -27,6 +27,7 @@ export class Chest extends Phaser.Sprite {
             } else {
                 coin = this.gameState.coins.create(this.x + this.width/2, this.y, 'coin');
                 coin.animations.add("spin", [0,1,2,3,4,3,2,1], 8, true);
+                coin.body.height -= 8;
                 coin.anchor.setTo(0.5);
             }
             coin.play('spin');
