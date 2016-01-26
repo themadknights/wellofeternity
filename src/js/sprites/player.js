@@ -29,7 +29,6 @@ export class Player extends Phaser.Sprite {
         this.maxHealth = PLAYER_MAX_HEALTH;
         this.health = this.maxHealth;
         this.tooFast = false;
-        this.allowJump = true;
         this.allowGrab = true;
         this.invulnerable = false;
 
@@ -121,7 +120,9 @@ export class Player extends Phaser.Sprite {
             if(this.isAttacking() && !this.weapon.visible) {
                 this.weapon.attack();
             }
-
+            if(this.touchedChest && !this.gameState.physics.arcade.intersects(this.touchedChest.body, this.body)) {
+                this.touchedChest = null;
+            }
             this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
             this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
 
@@ -144,7 +145,7 @@ export class Player extends Phaser.Sprite {
     }
 
     canJump() {
-        return this.body.blocked.down && this.allowJump;
+        return this.body.blocked.down && !this.touchedChest;
     }
 
     isJumping() {
@@ -173,12 +174,12 @@ export class Player extends Phaser.Sprite {
     onOverlapChest(chest, inputDownOnChest = false) {
         if(!chest.opened) {
             //Opening the chest and cancel player jump
-            this.allowJump = false;
+            this.touchedChest = chest;
             if(inputDownOnChest || this.isGrabbingTheRope()) {
                 chest.open();
                 let timer = this.game.time.create(this.game, true);
                 timer.add(0.5*Phaser.Timer.SECOND, function() {
-                    this.allowJump = true;
+                    this.touchedChest = null;
                 }, this);
                 timer.start();
             }
