@@ -61,6 +61,9 @@ export class StartState extends Phaser.State {
             this.map.putTile(98, i, 99);
         }
 
+        //Add sounds
+        this.coinFx = this.game.add.audio('coinFx');
+        this.coinFx.volume = 0.1;
         // Add walls
         this.createWalls();
         // Add rope to the back of the scene but in front background
@@ -107,8 +110,9 @@ export class StartState extends Phaser.State {
 
         this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
             if(coin.allowedPickup) {
+                this.coinFx.play();
                 coin.kill();
-                this.addScore(100);
+                this.addScore(coin.score);
             }
         }, null, this);
 
@@ -118,6 +122,7 @@ export class StartState extends Phaser.State {
         });
 
         this.physics.arcade.collide(this.coins, this.map.platforms);
+        this.physics.arcade.collide(this.coins, this.walls);
 
         if (this.player.isDead()) {
             this.gameOver();
@@ -131,6 +136,7 @@ export class StartState extends Phaser.State {
         if (this.showDebug) {
             this.game.debug.body(this.player);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
+            this.coins.forEach((coin) => this.game.debug.body(coin));
             this.traps.forEach((trap) => this.game.debug.body(trap));
             this.game.debug.text(`Player gravity: ${this.player.body.velocity.y}`, 50, 50);
         }

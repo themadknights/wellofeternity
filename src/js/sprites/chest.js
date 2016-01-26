@@ -23,17 +23,21 @@ export class Chest extends Phaser.Sprite {
         for(let i = 0; i < n; i++) {
             let coin = this.gameState.coins.getFirstExists(false);
             if(coin) {
-                coin.reset(this.x, this.y);
+                coin.reset(this.x + this.width/2, this.y);
             } else {
-                coin = this.gameState.coins.create(this.x, this.y, 'coin');
+                coin = this.gameState.coins.create(this.x + this.width/2, this.y, 'coin');
+                coin.animations.add("spin", [0,1,2,3,4,3,2,1], 8, true);
+                coin.body.height -= 8;
                 coin.anchor.setTo(0.5);
             }
+            coin.play('spin');
             coin.allowedPickup = false;
             let coinTimer = this.game.time.create(this.game, true);
             coinTimer.add(1*Phaser.Timer.SECOND, function() {
                 coin.allowedPickup = true;
             }, this);
             coinTimer.start();
+            coin.score = 100;
             coin.body.bounce.set(0.9);
             coin.body.velocity.x = this.game.rnd.between(-100, 100);
             coin.body.velocity.y = this.game.rnd.between(-200, -50);

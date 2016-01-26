@@ -15,7 +15,7 @@ export class LoadState extends Phaser.State {
         this.load.spritesheet('chest', 'images/chest.png', 64, 38, 2);
         this.load.spritesheet('machete', 'images/machete.png', 32, 48, 4);
         this.load.image('wall', 'images/wall.png');
-        this.load.image('coin', 'images/coin.png');
+        this.load.spritesheet('coin', 'images/coin.png', 32, 32, 5);
         this.load.image('hook', 'images/hook.png');
         this.load.image('walltrap', 'images/walltrap.png');
         this.load.image('projectile', 'images/arrow.png');
@@ -28,6 +28,7 @@ export class LoadState extends Phaser.State {
         this.load.audio('jumpFx', 'sounds/jump.wav');
         this.load.audio('floorFx', 'sounds/floor.wav');
         this.load.audio('stepFx', 'sounds/step.wav');
+        this.load.audio('coinFx', 'sounds/coin.wav');
 
         this.load.spritesheet('health_icons', 'images/health_icons.png', 16, 16, 2);
     }
