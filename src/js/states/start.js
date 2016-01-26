@@ -112,7 +112,7 @@ export class StartState extends Phaser.State {
             if(coin.allowedPickup) {
                 this.coinFx.play();
                 coin.kill();
-                this.addScore(100);
+                this.addScore(coin.score);
             }
         }, null, this);
 

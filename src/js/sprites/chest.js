@@ -37,6 +37,7 @@ export class Chest extends Phaser.Sprite {
                 coin.allowedPickup = true;
             }, this);
             coinTimer.start();
+            coin.score = 100;
             coin.body.bounce.set(0.9);
             coin.body.velocity.x = this.game.rnd.between(-100, 100);
             coin.body.velocity.y = this.game.rnd.between(-200, -50);
