@@ -26,8 +26,10 @@ export class Chest extends Phaser.Sprite {
                 coin.reset(this.x + this.width/2, this.y);
             } else {
                 coin = this.gameState.coins.create(this.x + this.width/2, this.y, 'coin');
+                coin.animations.add("spin", [0,1,2,3,4,3,2,1], 8, true);
                 coin.anchor.setTo(0.5);
             }
+            coin.play('spin');
             coin.allowedPickup = false;
             let coinTimer = this.game.time.create(this.game, true);
             coinTimer.add(1*Phaser.Timer.SECOND, function() {
