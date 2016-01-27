@@ -171,7 +171,6 @@ export class LevelState extends Phaser.State {
         this.rope.body.immovable = true;
         this.rope.body.allowGravity = false;
         this.rope.sendToBack();
-        this.rope.inputEnabled = true;
     }
 
     createWalls () {
