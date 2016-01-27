@@ -80,10 +80,6 @@ export class LevelState extends Phaser.State {
         });
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
-            //TODO: check deprecation when hook collide with tiles
-            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
-                player.grabHook();
-            }
             player.landing();
             if(player.tooFast) {
                 player.loseAllHealth();
@@ -93,10 +89,6 @@ export class LevelState extends Phaser.State {
         this.physics.arcade.overlap(this.player, this.traps, function(player, trap) {
             trap.fire();
         });
-
-        // this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
-        //     this.player.onHookSet();
-        // });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
             player.damage(enemy.attackDamage);

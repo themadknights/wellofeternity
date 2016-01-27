@@ -5,12 +5,13 @@ export class Hook extends Phaser.Sprite {
         super(game, 0, 0, 'hook');
         this.anchor.setTo(0.5);
         this.game = game;
+        this.owner = owner;
+        this.gameState = owner.gameState;
         this.game.physics.arcade.enable(this);
         this.body.allowGravity = false;
         this.game.add.existing(this);
-        this.owner = owner;
         this.visible = false;
-
+        this.anchored = false;
         this.rope = this.game.add.graphics(0, 0);
     }
 
@@ -25,11 +26,17 @@ export class Hook extends Phaser.Sprite {
                 return;
             }
 
+            // Draw hook rope as a simple white line
             this.rope.lineStyle(1, 0xffffff, 1);
             this.rope.beginFill();
             this.rope.moveTo(this.owner.body.center.x, this.owner.body.center.y);
             this.rope.lineTo(this.position.x, this.position.y);
             this.rope.endFill();
+
+            // Check hook collision
+            this.gameState.physics.arcade.collide(this, this.gameState.walls, () => this.onAnchored());
+            this.gameState.physics.arcade.collide(this, this.gameState.map.platforms, () => this.onAnchored());
+            this.gameState.physics.arcade.overlap(this, this.owner, () => this.onGrabbed());
         }
     }
 
@@ -40,43 +47,23 @@ export class Hook extends Phaser.Sprite {
             this.game.physics.arcade.moveToPointer(this, 800);
         }
     }
+
+    onAnchored () {
+        if (!this.anchored) {
+            this.anchored = true;
+            this.body.velocity.setTo(0);
+            this.owner.freezeMovement();
+            this.game.physics.arcade.moveToObject(this.owner, this, 800);
+        }
+    }
+
+    onGrabbed () {
+        if (this.anchored) {
+            this.anchored = false;
+            this.visible = false;
+            this.owner.body.velocity.setTo(0);
+            this.owner.allowMovement();
+            this.rope.clear();
+        }
+    }
 }
-
-
-
-// isShootingHook() {
-//     return ;
-// }
-//
-//     // Shoot hook
-//     if(this.isShootingHook() &&
-//
-//
-
-//
-//     this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
-// } else {
-//     this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
-// }
-//
-// if (this.hook.visible) {
-//     this.drawHookRope();
-// }
-// onHookSet () {
-//     this.animations.stop();
-//     this.frame = 0;
-//     this.tooFast = false;
-//     this.disableGravity();
-//     this.hook.body.velocity.setTo(0);
-//     this.game.physics.arcade.moveToObject(this, this.hook, 800);
-//     this.state = PLAYER_STATE_GRABBING_THE_HOOK;
-// }
-//
-// grabHook () {
-//     this.hook.visible = false;
-//     this.state = PLAYER_STATE_IDLE;
-//     this.body.velocity.y = 0;
-//     this.body.allowGravity = true;
-//     this.rope.clear();
-// }
-//

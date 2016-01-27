@@ -31,6 +31,7 @@ export class Player extends Phaser.Sprite {
         this.health = this.maxHealth;
         this.tooFast = false;
         this.invulnerable = false;
+        this.movementFrozen = false;
 
         //Creating animations
         this.animations.add('movement', [4, 5, 6, 7], 10, true);
@@ -56,55 +57,58 @@ export class Player extends Phaser.Sprite {
     }
 
     update() {
-        // Check if player is moving and set x velocity properly
-        this.body.velocity.x = 0;
+        // Check movementFrozen to prevent any action which modify player velocity
+        if (!this.movementFrozen) {
+            // Check if player is moving and set x velocity properly
+            this.body.velocity.x = 0;
 
-        if(this.aKey.isDown) {
-            this.body.velocity.x -= PLAYER_VELOCITY;
-            this.scale.setTo(-1, 1);
-        }
-
-        if(this.dKey.isDown) {
-            this.body.velocity.x += PLAYER_VELOCITY;
-            this.scale.setTo(1, 1);
-        }
-
-        // Play movement animation if player is moving
-        if (this.body.velocity.x !== 0) {
-            this.enableGravity();
-            this.play('movement');
-            if(!this.stepFx.isPlaying) {
-                this.stepFx.play();
+            if(this.aKey.isDown) {
+                this.body.velocity.x -= PLAYER_VELOCITY;
+                this.scale.setTo(-1, 1);
             }
-        } else {
-            this.animations.stop();
-            this.stepFx.stop();
-            this.frame = 0;
-        }
 
-        // Check if player is falling and play correct animation
-        if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
-            this.tooFast = true;
-            this.play('hardfall');
-        } else if (!this.body.blocked.down) {
-            this.play('fall');
-        }
+            if(this.dKey.isDown) {
+                this.body.velocity.x += PLAYER_VELOCITY;
+                this.scale.setTo(1, 1);
+            }
 
-        // Check if player can jump and perform the jump
-        if (this.canJump() && this.wKey.isDown) {
-            this.play('jump');
-            this.jumpFx.play();
-            this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
-        }
+            // Play movement animation if player is moving
+            if (this.body.velocity.x !== 0) {
+                this.enableGravity();
+                this.play('movement');
+                if(!this.stepFx.isPlaying) {
+                    this.stepFx.play();
+                }
+            } else {
+                this.animations.stop();
+                this.stepFx.stop();
+                this.frame = 0;
+            }
 
-        // Check if player is attacking and perform the attack
-        if(this.spaceKey.isDown) {
-            this.weapon.attack();
-        }
+            // Check if player is falling and play correct animation
+            if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
+                this.tooFast = true;
+                this.play('hardfall');
+            } else if (!this.body.blocked.down) {
+                this.play('fall');
+            }
 
-        // Check if player is shooting the hook and perform the action
-        if(this.game.input.activePointer.isDown) {
-            this.hook.shoot();
+            // Check if player can jump and perform the jump
+            if (this.canJump() && this.wKey.isDown) {
+                this.play('jump');
+                this.jumpFx.play();
+                this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
+            }
+
+            // Check if player is attacking and perform the attack
+            if(this.spaceKey.isDown) {
+                this.weapon.attack();
+            }
+
+            // Check if player is shooting the hook and perform the action
+            if(this.game.input.activePointer.isDown) {
+                this.hook.shoot();
+            }
         }
 
         // Check player physics against other sprites
@@ -189,5 +193,18 @@ export class Player extends Phaser.Sprite {
         if(this.state === PLAYER_STATE_FALLING && this.body.onFloor()) {
             this.floorFx.play();
         }
+    }
+
+    freezeMovement() {
+        this.body.velocity.setTo(0);
+        this.animations.stop();
+        this.frame = 0;
+        this.disableGravity();
+        this.movementFrozen = true;
+    }
+
+    allowMovement() {
+        this.enableGravity();
+        this.movementFrozen = false;
     }
 }
