@@ -13,6 +13,7 @@ export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 import { Weapon } from './sprites/weapon';
+import { Hook } from './sprites/hook';
 
 export class Player extends Phaser.Sprite {
 
@@ -29,7 +30,6 @@ export class Player extends Phaser.Sprite {
         this.maxHealth = PLAYER_MAX_HEALTH;
         this.health = this.maxHealth;
         this.tooFast = false;
-        this.allowGrab = true;
         this.invulnerable = false;
 
         //Creating animations
@@ -46,10 +46,8 @@ export class Player extends Phaser.Sprite {
         this.stepFx = this.game.add.audio('stepFx', true);
         this.stepFx.volume = 0.05;
 
-        // Create hook and hook rope
-        this.createHook();
-
         this.weapon = new Weapon(this.game, this, 'machete');
+        this.hook = new Hook(this.game, this);
 
         this.aKey = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
         this.dKey = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -100,8 +98,13 @@ export class Player extends Phaser.Sprite {
         }
 
         // Check if player is attacking and perform the attack
-        if(this.spaceKey.isDown && !this.weapon.visible) {
+        if(this.spaceKey.isDown) {
             this.weapon.attack();
+        }
+
+        // Check if player is shooting the hook and perform the action
+        if(this.game.input.activePointer.isDown) {
+            this.hook.shoot();
         }
 
         // Check player physics against other sprites
@@ -112,32 +115,8 @@ export class Player extends Phaser.Sprite {
         }
     }
 
-    //
-    //     // Shoot hook
-    //     if(this.isShootingHook() && !this.hook.visible) {
-    //         this.hook.reset(this.body.center.x, this.body.center.y);
-    //         this.hook.visible = true;
-    //         this.game.physics.arcade.moveToPointer(this.hook, 800);
-    //     }
-    //
-    //
-
-    //
-    //     this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
-    // } else {
-    //     this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
-    // }
-    //
-    // if (this.hook.visible) {
-    //     this.drawHookRope();
-    // }
-
     canJump() {
         return this.body.blocked.down && !this.touchedChest;
-    }
-
-    isShootingHook() {
-        return this.game.input.activePointer.isDown;
     }
 
     onOverlapRope() {
@@ -197,47 +176,6 @@ export class Player extends Phaser.Sprite {
 
     enableGravity () {
         this.body.allowGravity = true;
-    }
-
-    createHook () {
-        this.hook = this.game.add.sprite(0, 0, 'hook');
-        this.hook.visible = false;
-        this.game.physics.arcade.enable(this.hook);
-        this.hook.body.allowGravity = false;
-        this.line = new Phaser.Line(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
-        this.rope = this.game.add.graphics(0, 0);
-    }
-
-    onHookSet () {
-        this.animations.stop();
-        this.frame = 0;
-        this.tooFast = false;
-        this.disableGravity();
-        this.hook.body.velocity.setTo(0);
-        this.game.physics.arcade.moveToObject(this, this.hook, 800);
-        this.state = PLAYER_STATE_GRABBING_THE_HOOK;
-    }
-
-    grabHook () {
-        this.hook.visible = false;
-        this.state = PLAYER_STATE_IDLE;
-        this.body.velocity.y = 0;
-        this.body.allowGravity = true;
-        this.rope.clear();
-    }
-
-    drawHookRope () {
-        this.line.setTo(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
-        this.rope.clear();
-        this.rope.lineStyle(1, 0xffffff, 1);
-        this.rope.moveTo(this.line.start.x, this.line.start.y);
-        this.rope.lineTo(this.line.end.x, this.line.end.y);
-        this.rope.endFill();
-    }
-
-    attack() {
-        this.state = PLAYER_STATE_ATTACKING;
-        this.weapon.attack();
     }
 
     slide() {

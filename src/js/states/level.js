@@ -94,9 +94,9 @@ export class LevelState extends Phaser.State {
             trap.fire();
         });
 
-        this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
-            this.player.onHookSet();
-        });
+        // this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
+        //     this.player.onHookSet();
+        // });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
             player.damage(enemy.attackDamage);
