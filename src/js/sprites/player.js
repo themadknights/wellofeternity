@@ -76,7 +76,7 @@ export class Player extends Phaser.Sprite {
             if (this.body.velocity.x !== 0) {
                 this.enableGravity();
                 this.play('movement');
-                if(!this.stepFx.isPlaying) {
+                if(!this.stepFx.isPlaying && this.body.blocked.down) {
                     this.stepFx.play();
                 }
             } else {
