@@ -2,14 +2,7 @@ const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 600;
 const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
-const PLAYER_STATE_IDLE = 0;
-const PLAYER_STATE_GROUND = 1;
-const PLAYER_STATE_JUMPING = 2;
-const PLAYER_STATE_FALLING = 3;
-const PLAYER_STATE_GRABBING_THE_ROPE = 4;
-const PLAYER_STATE_ATTACKING = 5;
 const PLAYER_SLIDE_VELOCITY = 100;
-export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 import { Weapon } from './sprites/weapon';
@@ -109,13 +102,13 @@ export class Player extends Phaser.Sprite {
             if(this.game.input.activePointer.isDown) {
                 this.hook.shoot();
             }
-        }
 
-        // Check player physics against other sprites
-        this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
-        this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
-        if(this.touchedChest && !this.gameState.physics.arcade.intersects(this.touchedChest.body, this.body)) {
-            this.touchedChest = null;
+            // Check player physics against other sprites
+            this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
+            this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
+            if(this.touchedChest && !this.gameState.physics.arcade.intersects(this.touchedChest.body, this.body)) {
+                this.touchedChest = null;
+            }
         }
     }
 
@@ -183,16 +176,16 @@ export class Player extends Phaser.Sprite {
     }
 
     slide() {
-        if(this.body.velocity.y >= 0) {
-            this.allowGravity = false;
-            this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
-        }
+        //if(this.body.velocity.y >= 0) {
+        //    this.allowGravity = false;
+        //    this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
+        //}
     }
 
     landing() {
-        if(this.state === PLAYER_STATE_FALLING && this.body.onFloor()) {
-            this.floorFx.play();
-        }
+        //if(this.body.onFloor()) {
+        //    this.floorFx.play();
+        //}
     }
 
     freezeMovement() {

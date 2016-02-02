@@ -17,13 +17,15 @@ export class Hook extends Phaser.Sprite {
 
     update() {
         if (this.visible) {
-            let distance = Phaser.Point.distance(this.owner, this.position);
-
             this.rope.clear();
 
-            if (distance > HOOK_MAX_LENGTH) {
-                this.visible = false;
-                return;
+            if (!this.anchored) {
+                let distance = Phaser.Point.distance(this.owner, this.position);
+
+                if (distance > HOOK_MAX_LENGTH) {
+                    this.visible = false;
+                    return;
+                }
             }
 
             // Draw hook rope as a simple white line

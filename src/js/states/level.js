@@ -12,9 +12,11 @@ export class LevelState extends Phaser.State {
         //Starting Physics
         this.physics.startSystem(Phaser.Physics.ARCADE);
 
+        // @if NODE_ENV = 'development'
         //  Press F1 to toggle the debug display
         this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
         this.debugKey.onDown.add(this.toggleDebug, this);
+        // @endif
     }
 
     create() {
@@ -132,6 +134,7 @@ export class LevelState extends Phaser.State {
     render() {
         if (this.showDebug) {
             this.game.debug.body(this.player);
+            this.game.debug.body(this.player.hook);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
             this.coins.forEach((coin) => this.game.debug.body(coin));
             this.traps.forEach((trap) => this.game.debug.body(trap));
