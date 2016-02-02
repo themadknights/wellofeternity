@@ -201,12 +201,16 @@ export class LevelState extends Phaser.State {
 
         this.healthIcons = this.game.add.group();
         this.healthIcons.fixedToCamera = true;
+
         for (let i = 0; i < this.player.maxHealth; i += 1) {
             let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
             icon.anchor.setTo(0.5);
             this.healthIcons.add(icon);
         }
         this.updateHealthHud();
+
+        this.hookReadyLabel = this.game.add.bitmapText(10, 32, 'carrier_command', "Hook Ready", 12);
+        this.hookReadyLabel.fixedToCamera = true;
     }
 
     toggleDebug () {

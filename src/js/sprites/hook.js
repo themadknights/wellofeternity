@@ -1,4 +1,5 @@
 const HOOK_MAX_LENGTH = 300
+const HOOK_COOLDOWN = 5
 
 export class Hook extends Phaser.Sprite {
     constructor(game, owner) {
@@ -12,6 +13,7 @@ export class Hook extends Phaser.Sprite {
         this.game.add.existing(this);
         this.visible = false;
         this.anchored = false;
+        this.cooldown = false;
         this.rope = this.game.add.graphics(0, 0);
     }
 
@@ -43,7 +45,7 @@ export class Hook extends Phaser.Sprite {
     }
 
     shoot() {
-        if(!this.visible) {
+        if(!this.cooldown && !this.visible) {
             this.reset(this.owner.body.center.x, this.owner.body.center.y);
             this.visible = true;
             this.game.physics.arcade.moveToPointer(this, 800);
@@ -66,6 +68,15 @@ export class Hook extends Phaser.Sprite {
             this.owner.body.velocity.setTo(0);
             this.owner.allowMovement();
             this.rope.clear();
+            this.cooldown = true;
+            this.gameState.hookReadyLabel.visible = false;
+
+            let timer = this.game.time.create(this.game, true);
+            timer.add(HOOK_COOLDOWN * Phaser.Timer.SECOND, function() {
+                this.cooldown = false;
+                this.gameState.hookReadyLabel.visible = true;
+            }, this);
+            timer.start();
         }
     }
 }
