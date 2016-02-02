@@ -1,5 +1,6 @@
 var sourceFolder = 'src',
-    destFolder   = 'public';
+    destFolder   = 'public',
+    configFolder = 'config';
 
 module.exports = {
     folders: {
@@ -24,7 +25,8 @@ module.exports = {
         images: `${sourceFolder}/images/**/*.*`,
         sounds: `${sourceFolder}/sounds/**/*.*`,
         json: `${sourceFolder}/json/**/*.*`,
-        fonts: `${sourceFolder}/fonts/**/*.*`
+        fonts: `${sourceFolder}/fonts/**/*.*`,
+        cname: `${configFolder}/CNAME`
     },
     scripts: {
         destFolder: `${destFolder}/js`,
