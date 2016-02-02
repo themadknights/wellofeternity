@@ -3,7 +3,7 @@ import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
 import { WallTrap } from './sprites/walltrap';
 import { pad } from './utils';
 
-export class StartState extends Phaser.State {
+export class LevelState extends Phaser.State {
     constructor() {
         super();
     }
