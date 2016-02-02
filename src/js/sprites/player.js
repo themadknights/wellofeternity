@@ -91,6 +91,7 @@ export class Player extends Phaser.Sprite {
                 this.play('jump');
                 this.jumpFx.play();
                 this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
+                this.landed = false;
             }
 
             // Check if player is attacking and perform the attack
@@ -183,9 +184,10 @@ export class Player extends Phaser.Sprite {
     }
 
     landing() {
-        //if(this.body.onFloor()) {
-        //    this.floorFx.play();
-        //}
+        if(!this.landed && this.body.onFloor()) {
+            this.floorFx.play();
+            this.landed = true;
+        }
     }
 
     freezeMovement() {
