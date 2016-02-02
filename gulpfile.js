@@ -3,6 +3,12 @@ var gulp   = require('gulp'),
     env    = process.env.NODE_ENV || 'development',
     config = require('./config/gulp.config');
 
+gulp.task('clean', function () {
+    gulp.src(config.folders.dest)
+        .pipe($.plumber())
+        .pipe($.clean());
+});
+
 gulp.task('fonts', function () {
     gulp.src(config.files.fonts)
         .pipe($.plumber())
@@ -58,16 +64,30 @@ gulp.task('libs', function () {
 gulp.task('scripts', function () {
     gulp.src(config.files.scripts)
         .pipe($.plumber())
+        .pipe($.preprocess({
+            context: {
+                NODE_ENV: env
+            }
+        }))
         .pipe($.babel({
             modules: 'umd'
         }))
         .pipe($.concat(config.scripts.outFile))
         .pipe($.if(env === 'production', $.uglify()))
+        .pipe($.if(env === 'production', $.stripDebug()))
         .pipe(gulp.dest(config.scripts.destFolder))
         .pipe($.connect.reload());
 });
 
-gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images', 'sounds', 'json', 'fonts']);
+gulp.task('cname', function () {
+    gulp.src(config.files.cname)
+        .pipe($.plumber())
+        .pipe(gulp.dest(config.folders.dest))
+        .pipe($.connect.reload());
+});
+
+
+gulp.task('build', ['scripts', 'libs', 'templates', 'styles', 'images', 'sounds','json', 'fonts', 'cname']);
 
 gulp.task('watch', ['build'], function () {
     gulp.watch(config.files.scripts, ['scripts']);
