@@ -77,9 +77,7 @@ export class LevelState extends Phaser.State {
     }
 
     update() {
-        this.physics.arcade.collide(this.player, this.walls, function(player) {
-            player.slide();
-        });
+        this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
             player.landing();

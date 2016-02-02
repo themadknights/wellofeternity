@@ -2,7 +2,6 @@ const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 600;
 const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
-const PLAYER_SLIDE_VELOCITY = 100;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 import { Weapon } from './sprites/weapon';
@@ -176,17 +175,12 @@ export class Player extends Phaser.Sprite {
         this.body.allowGravity = true;
     }
 
-    slide() {
-        //if(this.body.velocity.y >= 0) {
-        //    this.allowGravity = false;
-        //    this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
-        //}
-    }
-
     landing() {
         if(!this.landed && this.body.onFloor()) {
             this.floorFx.play();
             this.landed = true;
+            this.sliding = false;
+            this.slidingCooldown = false;
         }
     }
 
