@@ -81,8 +81,13 @@ export class LevelState extends Phaser.State {
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
             player.landing();
-            if(player.tooFast) {
+
+            if (player.tooFast) {
                 player.loseAllHealth();
+            }
+
+            if (player.hook.anchored) {
+                player.hook.onGrabbed();
             }
         });
 
