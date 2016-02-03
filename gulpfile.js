@@ -64,6 +64,8 @@ gulp.task('libs', function () {
 gulp.task('scripts', function () {
     gulp.src(config.files.scripts)
         .pipe($.plumber())
+        .pipe($.jshint())
+        .pipe($.jshint.reporter('default'))
         .pipe($.preprocess({
             context: {
                 NODE_ENV: env

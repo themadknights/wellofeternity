@@ -16,6 +16,6 @@ EXPOSE 35729
 # Add source code
 ADD . $APP_HOME
 
-ENTRYPOINT ["npm", "run"]
+ENTRYPOINT ["npm"]
 
-CMD ["dev"]
+CMD ["run", "dev"]
