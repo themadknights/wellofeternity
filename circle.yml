@@ -3,12 +3,13 @@ machine:
     - docker
 
 dependencies:
+  cache_directories:
+    - node_modules
   override:
     - sudo pip install --upgrade docker-compose==1.5.2
-
-test:
-  pre:
     - docker-compose build
     - docker-compose run app install
+
+test:
   override:
     - docker-compose run app run build
