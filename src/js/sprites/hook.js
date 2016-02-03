@@ -1,5 +1,5 @@
-const HOOK_MAX_LENGTH = 300
-const HOOK_COOLDOWN = 5
+const HOOK_MAX_LENGTH = 300;
+const HOOK_COOLDOWN = 1;
 
 export class Hook extends Phaser.Sprite {
     constructor(game, owner) {
