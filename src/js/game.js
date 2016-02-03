@@ -1,5 +1,6 @@
 import { PreloadState } from './states/preload';
 import { LoadState } from './states/load';
+import { StartState } from './sates/start';
 import { LevelState } from './sates/level';
 import { PublisherState } from './sates/publisher';
 import { GameOverState } from './sates/game_over';
@@ -13,6 +14,7 @@ export class Game extends Phaser.Game {
         this.state.add('preload', new PreloadState());
         this.state.add('load', new LoadState());
         this.state.add('publisher', new PublisherState());
+        this.state.add('start', new StartState());
         this.state.add('level', new LevelState());
         this.state.add('gameover', new GameOverState());
 

@@ -7,6 +7,7 @@ export class LoadState extends Phaser.State {
         this.loadingText = this.game.add.bitmapText(this.game.world.centerX, this.game.world.centerY, 'carrier_command', "Loading...", 18);
         this.loadingText.anchor.setTo(0.5);
 
+        this.load.image('gameLogo', 'images/logo.png');
         this.load.image('tmkLogo', 'images/TMKSquareG.png');
         this.load.image('background', 'images/background.png');
         this.load.spritesheet('player', 'images/player.png', 32, 48, 20);
@@ -35,7 +36,7 @@ export class LoadState extends Phaser.State {
     }
 
     create () {
-        let defaultState = 'level';
+        let defaultState = 'start';
 
         // @if NODE_ENV='production'
         defaultState = 'publisher';
