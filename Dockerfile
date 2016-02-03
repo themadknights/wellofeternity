@@ -1,8 +1,5 @@
-FROM node:4.1.2
+FROM ultrayoshi/node-gulp-surge
 MAINTAINER david.morcillo@gmail.com
-
-# Install gulp globally
-RUN npm install -g gulp surge
 
 # Create working directory
 ENV APP_HOME /wellofeternity

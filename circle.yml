@@ -4,10 +4,13 @@ machine:
 
 dependencies:
   cache_directories:
+    - "~/docker"
     - node_modules
   override:
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
     - sudo pip install --upgrade docker-compose==1.5.2
     - docker-compose build
+    - mkdir -p ~/docker; docker save ultrayoshi/node-gulp-surge > ~/docker/image.tar
     - docker-compose run app install
 
 test:
