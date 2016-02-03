@@ -9,6 +9,6 @@ dependencies:
 test:
   pre:
     - docker-compose build
-    - docker-compose run --rm app install
+    - docker-compose run app install
   override:
-    - docker-compose run --rm app run build
+    - docker-compose run app run build
