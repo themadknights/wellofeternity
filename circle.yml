@@ -1,0 +1,14 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - sudo pip install --upgrade docker-compose==1.5.2
+
+test:
+  pre:
+    - docker-compose build
+    - docker-compose run --rm app install
+  override:
+    - docker-compose run --rm app run build

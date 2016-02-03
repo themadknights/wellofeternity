@@ -4,6 +4,7 @@
   "description": "## Development",
   "main": "gulpfile.js",
   "scripts": {
+    "build": "gulp clean && gulp build",
     "dev": "gulp clean && gulp dev",
     "deploy": "gulp clean && NODE_ENV=production gulp build && surge public"
   },
