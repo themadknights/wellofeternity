@@ -20,6 +20,12 @@ export class Chest extends Phaser.Sprite {
         //Spawning coins
         let n = this.game.rnd.integerInRange(1, 5);
 
+        function allowCoinPickup(coin) {
+          return function () {
+            coin.allowedPickup = true;
+          };
+        }
+
         for(let i = 0; i < n; i++) {
             let coin = this.gameState.coins.getFirstExists(false);
             if(coin) {
@@ -33,9 +39,7 @@ export class Chest extends Phaser.Sprite {
             coin.play('spin');
             coin.allowedPickup = false;
             let coinTimer = this.game.time.create(this.game, true);
-            coinTimer.add(1*Phaser.Timer.SECOND, function() {
-                coin.allowedPickup = true;
-            }, this);
+            coinTimer.add(1 * Phaser.Timer.SECOND, allowCoinPickup(coin));
             coinTimer.start();
             coin.score = 100;
             coin.body.bounce.set(0.9);
