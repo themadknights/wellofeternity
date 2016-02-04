@@ -2,17 +2,10 @@ const PLAYER_MAX_HEALTH = 3;
 const PLAYER_FALL_SPEED_LIMIT = 600;
 const PLAYER_VELOCITY = 200;
 const PLAYER_JUMP_VELOCITY = 200;
-const PLAYER_STATE_IDLE = 0;
-const PLAYER_STATE_GROUND = 1;
-const PLAYER_STATE_JUMPING = 2;
-const PLAYER_STATE_FALLING = 3;
-const PLAYER_STATE_GRABBING_THE_ROPE = 4;
-const PLAYER_STATE_ATTACKING = 5;
-const PLAYER_SLIDE_VELOCITY = 100;
-export const PLAYER_STATE_GRABBING_THE_HOOK = 5;
 export const PLAYER_SPIKE_VELOCITY = 50;
 
 import { Weapon } from './sprites/weapon';
+import { Hook } from './sprites/hook';
 
 export class Player extends Phaser.Sprite {
 
@@ -29,8 +22,8 @@ export class Player extends Phaser.Sprite {
         this.maxHealth = PLAYER_MAX_HEALTH;
         this.health = this.maxHealth;
         this.tooFast = false;
-        this.allowGrab = true;
         this.invulnerable = false;
+        this.movementFrozen = false;
 
         //Creating animations
         this.animations.add('movement', [4, 5, 6, 7], 10, true);
@@ -46,136 +39,97 @@ export class Player extends Phaser.Sprite {
         this.stepFx = this.game.add.audio('stepFx', true);
         this.stepFx.volume = 0.05;
 
-        // Create hook and hook rope
-        this.createHook();
-
         this.weapon = new Weapon(this.game, this, 'machete');
+        this.hook = new Hook(this.game, this);
 
+        this.aKey = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
+        this.dKey = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
         this.wKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     }
 
     update() {
-        this.moving = false;
-        if (this.state !== PLAYER_STATE_GRABBING_THE_HOOK && this.state !== PLAYER_STATE_ATTACKING) {
-            //Checking Input
+        // Check movementFrozen to prevent any action which modify player velocity
+        if (!this.movementFrozen) {
+            // Check if player is moving and set x velocity properly
             this.body.velocity.x = 0;
 
-            if(this.isMovingLeft()) {
+            if(this.aKey.isDown) {
                 this.body.velocity.x -= PLAYER_VELOCITY;
                 this.scale.setTo(-1, 1);
-                this.body.allowGravity = true;
-                this.moving = true;
             }
-            if(this.isMovingRight()) {
+
+            if(this.dKey.isDown) {
                 this.body.velocity.x += PLAYER_VELOCITY;
                 this.scale.setTo(1, 1);
-                this.body.allowGravity = true;
-                this.moving = true;
             }
 
-            if (this.state !== PLAYER_STATE_GRABBING_THE_ROPE) {
-                if (this.canJump() && this.isJumping()) {
-                    this.play('jump');
-                    this.jumpFx.play();
-                    this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
-                    this.allowGrab = false;
-                    this.wKey.onUp.addOnce(() => this.allowGrab = true);
+            // Play movement animation if player is moving
+            if (this.body.velocity.x !== 0) {
+                this.enableGravity();
+                this.play('movement');
+                if(!this.stepFx.isPlaying && this.body.blocked.down) {
+                    this.stepFx.play();
                 }
+            } else {
+                this.animations.stop();
+                this.stepFx.stop();
+                this.frame = 0;
             }
 
-            // Check player velocity in y to set his state
-            if(this.body.velocity.y < 0) {
-                this.state = PLAYER_STATE_JUMPING;
-            } else if(this.body.velocity.y > 0) {
-                if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
-                    this.tooFast = true;
-                    this.play('hardfall');
-                } else {
-                    this.play('fall');
-                }
-                this.state = PLAYER_STATE_FALLING;
-            } else if (this.body.blocked.down) {
-                this.state = PLAYER_STATE_GROUND;
-                if(this.moving) {
-                    this.play('movement');
-                    if(!this.stepFx.isPlaying) {
-                        this.stepFx.play();
-                    }
-                } else {
-                    this.animations.stop();
-                    this.stepFx.stop();
-                    this.frame = 0;
-                }
+            // Check if player is falling and play correct animation
+            if (this.body.velocity.y > PLAYER_FALL_SPEED_LIMIT) {
+                this.tooFast = true;
+                this.play('hardfall');
+            } else if (!this.body.blocked.down) {
+                this.play('fall');
             }
 
-            // Shoot hook
-            if(this.isShootingHook() && !this.hook.visible) {
-                this.hook.reset(this.body.center.x, this.body.center.y);
-                this.hook.visible = true;
-                this.game.physics.arcade.moveToPointer(this.hook, 800);
+            // Check if player can jump and perform the jump
+            if (this.canJump() && this.wKey.isDown) {
+                this.play('jump');
+                this.jumpFx.play();
+                this.body.velocity.y = -PLAYER_JUMP_VELOCITY;
+                this.landed = false;
             }
 
-            // Attack with a weapon
-            if(this.isAttacking() && !this.weapon.visible) {
+            // Check if player is attacking and perform the attack
+            if(this.spaceKey.isDown) {
                 this.weapon.attack();
             }
+
+            // Check if player is shooting the hook and perform the action
+            if(this.game.input.activePointer.isDown) {
+                this.hook.shoot();
+            }
+
+            // Check player physics against other sprites
+            this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
+            this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
             if(this.touchedChest && !this.gameState.physics.arcade.intersects(this.touchedChest.body, this.body)) {
                 this.touchedChest = null;
             }
-            this.gameState.physics.arcade.overlap(this, this.gameState.rope, (player) => player.onOverlapRope());
-            this.gameState.physics.arcade.overlap(this, this.gameState.chests, (player, chest) => player.onOverlapChest(chest));
-
-            this.gameState.physics.arcade.collide(this.hook, this.gameState.walls, () => this.onHookSet());
-        } else {
-            this.gameState.physics.arcade.overlap(this, this.hook, () => this.grabHook());
         }
-
-        if (this.hook.visible) {
-            this.drawHookRope();
-        }
-    }
-
-    isMovingLeft() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.A);
-    }
-
-    isMovingRight() {
-        return this.game.input.keyboard.isDown(Phaser.KeyCode.D);
     }
 
     canJump() {
         return this.body.blocked.down && !this.touchedChest;
     }
 
-    isJumping() {
-        return this.wKey.isDown;
-    }
-
-    isShootingHook() {
-        return this.game.input.activePointer.isDown;
-    }
-
-    isAttacking() {
-        return this.spaceKey.isDown;
-    }
-
-    onOverlapRope(inputDownOnRope = false) {
-        if (this.allowGrab && this.state !== PLAYER_STATE_GRABBING_THE_ROPE && (inputDownOnRope || this.isGrabbingTheRope())) {
+    onOverlapRope() {
+        if (!this.body.blocked.down && this.wKey.isDown) {
+            // TODO: a grab animation maybe?
             this.animations.stop();
-            this.frame = 0;
-            this.tooFast = false;
-            this.state = PLAYER_STATE_GRABBING_THE_ROPE;
             this.position.x = this.gameState.rope.x;
             this.disableGravity();
         }
     }
 
-    onOverlapChest(chest, inputDownOnChest = false) {
+    onOverlapChest(chest) {
         if(!chest.opened) {
             //Opening the chest and cancel player jump
             this.touchedChest = chest;
-            if(inputDownOnChest || this.isGrabbingTheRope()) {
+            if (this.wKey.isDown) {
                 chest.open();
                 let timer = this.game.time.create(this.game, true);
                 timer.add(0.5*Phaser.Timer.SECOND, function() {
@@ -184,10 +138,6 @@ export class Player extends Phaser.Sprite {
                 timer.start();
             }
         }
-    }
-
-    isGrabbingTheRope() {
-        return this.wKey.isDown;
     }
 
     damage(amount) {
@@ -218,59 +168,32 @@ export class Player extends Phaser.Sprite {
     disableGravity () {
         this.body.allowGravity = false;
         this.body.velocity.y = 0;
-    }
-
-    createHook () {
-        this.hook = this.game.add.sprite(0, 0, 'hook');
-        this.hook.visible = false;
-        this.game.physics.arcade.enable(this.hook);
-        this.hook.body.allowGravity = false;
-        this.line = new Phaser.Line(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
-        this.rope = this.game.add.graphics(0, 0);
-    }
-
-    onHookSet () {
-        this.animations.stop();
-        this.frame = 0;
         this.tooFast = false;
-        this.disableGravity();
-        this.hook.body.velocity.setTo(0);
-        this.game.physics.arcade.moveToObject(this, this.hook, 800);
-        this.state = PLAYER_STATE_GRABBING_THE_HOOK;
     }
 
-    grabHook () {
-        this.hook.visible = false;
-        this.state = PLAYER_STATE_IDLE;
-        this.body.velocity.y = 0;
+    enableGravity () {
         this.body.allowGravity = true;
-        this.rope.clear();
-    }
-
-    drawHookRope () {
-        this.line.setTo(this.position.x, this.position.y, this.hook.body.center.x, this.hook.body.center.y);
-        this.rope.clear();
-        this.rope.lineStyle(1, 0xffffff, 1);
-        this.rope.moveTo(this.line.start.x, this.line.start.y);
-        this.rope.lineTo(this.line.end.x, this.line.end.y);
-        this.rope.endFill();
-    }
-
-    attack() {
-        this.state = PLAYER_STATE_ATTACKING;
-        this.weapon.attack();
-    }
-
-    slide() {
-        if(this.body.velocity.y >= 0) {
-            this.allowGravity = false;
-            this.body.velocity.y = PLAYER_SLIDE_VELOCITY;
-        }
     }
 
     landing() {
-        if(this.state === PLAYER_STATE_FALLING && this.body.onFloor()) {
+        if(!this.landed && this.body.onFloor()) {
             this.floorFx.play();
+            this.landed = true;
+            this.sliding = false;
+            this.slidingCooldown = false;
         }
+    }
+
+    freezeMovement() {
+        this.body.velocity.setTo(0);
+        this.animations.stop();
+        this.frame = 0;
+        this.disableGravity();
+        this.movementFrozen = true;
+    }
+
+    allowMovement() {
+        this.enableGravity();
+        this.movementFrozen = false;
     }
 }

@@ -1,5 +1,5 @@
 import { Map } from './map';
-import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
+import { Player } from './sprites/player';
 import { WallTrap } from './sprites/walltrap';
 import { pad } from './utils';
 
@@ -12,9 +12,11 @@ export class LevelState extends Phaser.State {
         //Starting Physics
         this.physics.startSystem(Phaser.Physics.ARCADE);
 
+        // @if NODE_ENV = 'development'
         //  Press F1 to toggle the debug display
         this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
         this.debugKey.onDown.add(this.toggleDebug, this);
+        // @endif
     }
 
     create() {
@@ -75,27 +77,22 @@ export class LevelState extends Phaser.State {
     }
 
     update() {
-        this.physics.arcade.collide(this.player, this.walls, function(player) {
-            player.slide();
-        });
+        this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
-            //TODO: check deprecation when hook collide with tiles
-            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
-                player.grabHook();
-            }
             player.landing();
-            if(player.tooFast) {
+
+            if (player.tooFast) {
                 player.loseAllHealth();
+            }
+
+            if (player.hook.anchored) {
+                player.hook.onGrabbed();
             }
         });
 
         this.physics.arcade.overlap(this.player, this.traps, function(player, trap) {
             trap.fire();
-        });
-
-        this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
-            this.player.onHookSet();
         });
 
         this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
@@ -135,6 +132,7 @@ export class LevelState extends Phaser.State {
     render() {
         if (this.showDebug) {
             this.game.debug.body(this.player);
+            this.game.debug.body(this.player.hook);
             this.enemies.forEach((enemy) => this.game.debug.body(enemy));
             this.coins.forEach((coin) => this.game.debug.body(coin));
             this.traps.forEach((trap) => this.game.debug.body(trap));
@@ -171,7 +169,6 @@ export class LevelState extends Phaser.State {
         this.rope.body.immovable = true;
         this.rope.body.allowGravity = false;
         this.rope.sendToBack();
-        this.rope.inputEnabled = true;
     }
 
     createWalls () {
@@ -202,12 +199,16 @@ export class LevelState extends Phaser.State {
 
         this.healthIcons = this.game.add.group();
         this.healthIcons.fixedToCamera = true;
+
         for (let i = 0; i < this.player.maxHealth; i += 1) {
             let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
             icon.anchor.setTo(0.5);
             this.healthIcons.add(icon);
         }
         this.updateHealthHud();
+
+        this.hookReadyLabel = this.game.add.bitmapText(10, 32, 'carrier_command', "Hook Ready", 12);
+        this.hookReadyLabel.fixedToCamera = true;
     }
 
     toggleDebug () {

@@ -26,7 +26,7 @@ export class GameOverState extends Phaser.State {
     update() {
         if(this.canClose) {
             if(this.input.keyboard.isDown(Phaser.KeyCode.SPACEBAR)) {
-                this.state.start('start');
+                this.state.start('level');
             }
         }
     }

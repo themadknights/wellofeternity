@@ -18,8 +18,10 @@ export class Weapon extends Phaser.Sprite {
     }
 
     attack() {
-        this.visible = true;
-        this.attackAnimation.play(12);
-        this.attackAnimation.onComplete.add(() => this.visible = false);
+        if (!this.visible) {
+            this.visible = true;
+            this.attackAnimation.play(12);
+            this.attackAnimation.onComplete.add(() => this.visible = false);
+        }
     }
 }
