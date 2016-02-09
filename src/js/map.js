@@ -8,10 +8,12 @@ export class Map extends Phaser.Tilemap {
 
         this.gameState = state;
         this.addTilesetImage('world');
-        this.platforms = this.create('platforms', 20, 100, 32, 32);
+        //TODO: Tamaño según el nivel.
+        this.platforms = this.create('platforms', 20, 10000, 32, 32);
 
         //Creating the map and its main layer, resizering the world to fix that layer
         this.mapPresets = [];
+        this.lastChunkGenerated = 0;
         // this.mapPresets.push(this.game.cache.getJSON('presetTest01'));
         for(let i = 0; i < 3; i++) {
             this.mapPresets[i] = this.game.cache.getJSON('preset0' + (i+1));
@@ -62,6 +64,8 @@ export class Map extends Phaser.Tilemap {
                     break;
             }
         }, this);
+
+        this.lastChunkGenerated = y;
 
         this.setCollisionBetween(0, 5);
     }
