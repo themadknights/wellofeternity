@@ -25,6 +25,10 @@ export class Player extends Phaser.Sprite {
         this.invulnerable = false;
         this.movementFrozen = false;
 
+        // @if NODE_ENV = 'development'
+        this.godMode = false;
+        // @endif
+
         //Creating animations
         this.animations.add('movement', [4, 5, 6, 7], 10, true);
         this.animations.add('jump', [8, 9, 10, 11], 6, false);
@@ -141,7 +145,7 @@ export class Player extends Phaser.Sprite {
     }
 
     damage(amount) {
-        if(!this.invulnerable) {
+        if(!this.godMode && !this.invulnerable) {
             this.health -= amount;
             this.invulnerable = true;
             let timer = this.game.time.create(this.game, true);

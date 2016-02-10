@@ -8,7 +8,9 @@ export class LevelState extends Phaser.State {
         super();
     }
 
-    init() {
+    init(difficulty) {
+        this.difficulty = difficulty;
+
         //Starting Physics
         this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -45,27 +47,12 @@ export class LevelState extends Phaser.State {
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
 
         //Map
-        this.map = new Map(this.game, this);
-
-        // TODO: generate a few chunks for testing purposes
-        for(let i = 1; i < 5; i++) {
-            this.map.generateWorldChunk(20*i);
-        }
-
-        //Replace 12 index for 12..15 randomly
-        this.map.replaceRandomSpikes();
-
-        // Resize world after adding chunks
-        this.map.platforms.resizeWorld();
-
-        //TODO: Example of goal, to be deleted when the map generation si done
-        // for(let i = 0; i < 20; i++) {
-        //     this.map.putTile(98, i, 99);
-        // }
+        this.map = new Map(this.game, this, this.difficulty);
 
         //Add sounds
         this.coinFx = this.game.add.audio('coinFx');
         this.coinFx.volume = 0.1;
+
         // Add walls
         this.createWalls();
         // Add rope to the back of the scene but in front background
@@ -77,8 +64,10 @@ export class LevelState extends Phaser.State {
     }
 
     update() {
-        if(this.player.position.y >= (this.map.lastChunkGenerated - 20)*this.map.tileHeight) {
-            this.map.generateWorldChunk(this.map.lastChunkGenerated + 20);
+        if (!this.map.isFinished()) {
+            if(this.player.position.y >= (this.map.lastChunkGenerated - 20) * this.map.tileHeight) {
+                this.map.generateWorldChunk(this.map.lastChunkGenerated + 20);
+            }
         }
 
         this.physics.arcade.collide(this.player, this.walls);
@@ -159,6 +148,12 @@ export class LevelState extends Phaser.State {
         }
     }
 
+    updateChunksHud () {
+        if (this.chunksLabel) {
+          this.chunksLabel.text = `Chunks: ${this.map.chunks} / ${this.map.maxChunks}`;
+        }
+    }
+
     createBackground () {
         this.background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
         this.background.sendToBack();
@@ -213,6 +208,16 @@ export class LevelState extends Phaser.State {
 
         this.hookReadyLabel = this.game.add.bitmapText(10, 32, 'carrier_command', "Hook Ready", 12);
         this.hookReadyLabel.fixedToCamera = true;
+
+        this.chunksLabel = this.game.add.bitmapText(this.game.width - 10, 32, 'carrier_command', "Chunks: ? / ?", 12);
+        this.chunksLabel.anchor.setTo(1, 0);
+        this.chunksLabel.fixedToCamera = true;
+        this.updateChunksHud();
+
+        if (this.player.godMode) {
+          this.godModeLabel = this.game.add.bitmapText(10, 54, 'carrier_command', "GOD MODE", 12);
+          this.godModeLabel.fixedToCamera = true;
+        }
     }
 
     toggleDebug () {
