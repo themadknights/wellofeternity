@@ -17,5 +17,23 @@ export class Game extends Phaser.Game {
         this.state.add('gameover', new GameOverState());
 
         this.state.start('preload');
+
+        this.stats = new window.Stats();
+
+        this.stats.setMode(2);
+
+        // align top-left
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.left = '0px';
+        this.stats.domElement.style.top = '0px';
+
+        document.body.appendChild(this.stats.domElement);
+        this.stats.begin();
+    }
+
+    update(time) {
+        this.stats.end();
+        this.stats.begin();
+        super.update(time);
     }
 }

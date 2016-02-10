@@ -59,9 +59,9 @@ export class LevelState extends Phaser.State {
         this.map.platforms.resizeWorld();
 
         //TODO: Example of goal, to be deleted when the map generation si done
-        for(let i = 0; i < 20; i++) {
-            this.map.putTile(98, i, 99);
-        }
+        // for(let i = 0; i < 20; i++) {
+        //     this.map.putTile(98, i, 99);
+        // }
 
         //Add sounds
         this.coinFx = this.game.add.audio('coinFx');
@@ -77,6 +77,10 @@ export class LevelState extends Phaser.State {
     }
 
     update() {
+        if(this.player.position.y >= (this.map.lastChunkGenerated - 20)*this.map.tileHeight) {
+            this.map.generateWorldChunk(this.map.lastChunkGenerated + 20);
+        }
+
         this.physics.arcade.collide(this.player, this.walls);
 
         this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
