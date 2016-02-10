@@ -1,5 +1,6 @@
 import { Map } from './map';
 import { Player } from './sprites/player';
+import { PowerUp } from './sprites/powerup';
 import { WallTrap } from './sprites/walltrap';
 import { pad } from './utils';
 
@@ -40,6 +41,11 @@ export class LevelState extends Phaser.State {
         this.traps.add(new WallTrap(this.game, this, 300));
         this.traps.add(new WallTrap(this.game, this, 400));
         this.traps.add(new WallTrap(this.game, this, 500));
+
+        //PowerUp Pool
+        this.powerups = this.game.add.group();
+        this.powerups.add(new PowerUp(this.game, 200, 200));
+
 
         //Player
         this.player = new Player(this.game, this, this.game.world.centerX, 100);
@@ -124,6 +130,9 @@ export class LevelState extends Phaser.State {
 
         this.physics.arcade.collide(this.coins, this.map.platforms);
         this.physics.arcade.collide(this.coins, this.walls);
+
+        this.physics.arcade.collide(this.powerups, this.map.platforms);
+        this.physics.arcade.collide(this.powerups, this.walls);
 
         if (this.player.isDead()) {
             this.gameOver();

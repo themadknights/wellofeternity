@@ -20,6 +20,7 @@ export class LoadState extends Phaser.State {
         this.load.image('hook', 'images/hook.png');
         this.load.image('walltrap', 'images/walltrap.png');
         this.load.image('projectile', 'images/arrow.png');
+        this.load.image('powerup', 'images/powerup.png');
 
         this.load.json('presetTest01', 'json/preset_test_01.json');
         this.load.json('preset01', 'json/preset01.json');
@@ -40,7 +41,7 @@ export class LoadState extends Phaser.State {
         // @if NODE_ENV='production'
         defaultState = 'publisher';
         // @endif
-        
+
         this.game.state.start(defaultState, true, false);
     }
 }
