@@ -9,6 +9,8 @@ export class Enemy extends Phaser.Sprite {
         this.game.physics.arcade.enable(this);
         this.attackDamage = data.attackDamage;
         this.health = data.health;
+        this.body.width -= 16;
+        this.body.height -= 16;
         this.body.allowGravity = false;
         this.invulnerable = false;
     }

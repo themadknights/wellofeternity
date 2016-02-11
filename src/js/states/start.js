@@ -1,213 +1,129 @@
-import { Map } from './map';
-import { Player, PLAYER_STATE_GRABBING_THE_HOOK } from './sprites/player';
-import { WallTrap } from './sprites/walltrap';
-import { pad } from './utils';
+import { TextButton } from 'ui/text_button';
 
 export class StartState extends Phaser.State {
     constructor() {
         super();
     }
 
-    init() {
-        //Starting Physics
-        this.physics.startSystem(Phaser.Physics.ARCADE);
-        //Starting Gamepad Support
-        this.input.gamepad.start();
-
-        //  Press F1 to toggle the debug display
-        this.debugKey = this.input.keyboard.addKey(Phaser.Keyboard.F1);
-        this.debugKey.onDown.add(this.toggleDebug, this);
-    }
-
     create() {
-        //Creating gravity
-        this.physics.arcade.gravity.y = 300;
+        this.gameLogo = this.game.add.image(this.game.world.centerX, this.game.world.centerY - 200, 'gameLogo');
+        this.gameLogo.anchor.setTo(0.5);
 
-        //Enemies group
-        this.enemies = this.game.add.group();
+        this.panels = {};
+        this.createStartPanel();
+        this.createModePanel();
+        this.createLevelsPanel();
+    }
 
-        //Chest group
-        this.chests = this.game.add.group();
-
-        //Coins group
-        this.coins = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
-        this.coins.enableBody = true;
-
-        //Wall trap and projectile group
-        this.traps = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
-        this.projectiles = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
-        this.traps.add(new WallTrap(this.game, this, 200));
-        this.traps.add(new WallTrap(this.game, this, 300));
-        this.traps.add(new WallTrap(this.game, this, 400));
-        this.traps.add(new WallTrap(this.game, this, 500));
-
-        //Player
-        this.player = new Player(this.game, this, this.game.world.centerX, 100);
-
-        //Map
-        this.map = new Map(this.game, this);
-
-        // TODO: generate a few chunks for testing purposes
-        for(let i = 1; i < 5; i++) {
-            this.map.generateWorldChunk(20*i);
+    togglePanel(panelId) {
+        for (let panelId in this.panels) {
+            this.panels[panelId].visible = false;
         }
-
-        //Replace 12 index for 12..15 randomly
-        this.map.replaceRandomSpikes();
-
-        // Resize world after adding chunks
-        this.map.platforms.resizeWorld();
-
-        //TODO: Example of goal, to be deleted when the map generation si done
-        for(let i = 0; i < 20; i++) {
-            this.map.putTile(98, i, 99);
-        }
-
-        // Add walls
-        this.createWalls();
-        // Add rope to the back of the scene but in front background
-        this.createRope();
-        // Add simple background as tile sprite
-        this.createBackground();
-        // Add hud in front of all the objects
-        this.createHUD();
+        this.panels[panelId].visible = true;
     }
 
-    update() {
-        this.physics.arcade.collide(this.player, this.walls);
+    startLevel(levelId) {
+        this.game.state.start('level', true, false, levelId);
+    }
 
-        this.physics.arcade.collide(this.player, this.map.platforms, function(player) {
-            //TODO: check deprecation when hook collide with tiles
-            if (player.state === PLAYER_STATE_GRABBING_THE_HOOK) {
-                player.grabHook();
-            }
+    createStartPanel() {
+        let panel = this.game.add.group();
 
-            if(player.tooFast) {
-                player.loseAllHealth();
-            }
+        panel.position = { x: this.game.world.centerX, y: this.game.world.centerY + 25 };
+
+        this.startButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 0 },
+            text: "Start Game",
+            callback: () => { this.togglePanel('mode'); }
         });
 
-        this.physics.arcade.overlap(this.player, this.traps, function(player, trap) {
-            trap.fire();
+        this.optionsButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 125 },
+            text: "Options",
+            disabled: true
         });
 
-        this.physics.arcade.collide(this.player.hook, this.map.platforms, () => {
-            this.player.onHookSet();
+        this.panels["start"] = panel;
+    }
+
+    createModePanel() {
+        let panel = this.game.add.group();
+
+        panel.position = { x: this.game.world.centerX, y: this.game.world.centerY + 25 };
+        panel.visible = false;
+
+        this.normalModeButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 0 },
+            text: "Normal Mode",
+            callback: () => { this.togglePanel('level'); }
         });
 
-        this.physics.arcade.overlap(this.player, this.enemies, function(player, enemy) {
-            player.damage(enemy.attackDamage);
+        this.infiniteModeButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 125 },
+            text: "Infinte Mode",
+            callback: () => { this.startLevel('infinite'); }
         });
 
-        this.physics.arcade.overlap(this.player.weapon, this.enemies, (weapon, enemy) => {
-            if (weapon.visible) {
-                enemy.damage(weapon.attackDamage);
-            }
+        this.infiniteModeButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: -225, y: 350 },
+            scale: 0.5,
+            text: "Back",
+            callback: () => { this.togglePanel('start'); }
         });
 
-        this.physics.arcade.overlap(this.player, this.coins, function(player, coin) {
-            if(coin.allowedPickup) {
-                coin.kill();
-                this.addScore(100);
-            }
-        }, null, this);
+        this.panels["mode"] = panel;
+    }
 
-        this.physics.arcade.overlap(this.player, this.projectiles, function(player, projectile) {
-            player.damage(projectile.attackDamage);
-            projectile.kill();
+    createLevelsPanel() {
+        let panel = this.game.add.group();
+
+        panel.position = { x: this.game.world.centerX, y: this.game.world.centerY + 25 };
+        panel.visible = false;
+
+        this.easyLevelButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 0 },
+            text: "Easy",
+            callback: () => { this.startLevel('easy'); }
         });
 
-        this.physics.arcade.collide(this.coins, this.map.platforms);
-
-        if (this.player.isDead()) {
-            this.gameOver();
-        }
-
-        this.background.autoScroll(0, (this.cameraLastPositionY - this.camera.position.y) * 20);
-        this.cameraLastPositionY = this.camera.position.y;
-    }
-
-    render() {
-        if (this.showDebug) {
-            this.game.debug.body(this.player);
-            this.enemies.forEach((enemy) => this.game.debug.body(enemy));
-            this.traps.forEach((trap) => this.game.debug.body(trap));
-        }
-    }
-
-    gameOver() {
-        this.game.state.start('gameover', true, false, this.score);
-    }
-
-    addScore (amount) {
-        this.score += amount;
-        this.scoreLabel.text = `Score: ${pad(this.score)}`;
-    }
-
-    updateHealthHud () {
-        for (let i = 0; i < this.player.maxHealth; i += 1) {
-            this.healthIcons.children[i].frame = i < this.player.health ? 0 : 1;
-        }
-    }
-
-    createBackground () {
-        this.background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
-        this.background.sendToBack();
-        this.background.fixedToCamera = true;
-        this.cameraLastPositionY = this.camera.position.y;
-    }
-
-    createRope () {
-        this.rope = this.game.add.tileSprite(this.game.world.centerX, 0, 16, this.game.world.height, 'rope');
-        this.game.physics.arcade.enable(this.rope);
-        this.rope.anchor.setTo(0.5, 0);
-        this.rope.body.immovable = true;
-        this.rope.body.allowGravity = false;
-        this.rope.sendToBack();
-        this.rope.inputEnabled = true;
-        this.rope.events.onInputDown.add(() => {
-            this.player.allowGrab = true;
-            this.physics.arcade.overlap(this.player, this.rope, (player) => player.onOverlapRope(true));
+        this.normalLevelButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 125 },
+            text: "Normal",
+            callback: () => { this.startLevel('normal'); }
         });
-    }
 
-    createWalls () {
-        let leftWall = this.game.add.tileSprite(0, 0, 16, this.game.world.height, 'wall');
-        let rightWall = this.game.add.tileSprite(this.game.width, 0, 16, this.game.world.height, 'wall');
+        this.insaneLevelButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: 0, y: 250 },
+            text: "Insane",
+            callback: () => { this.startLevel('insane'); }
+        });
 
-        this.walls = this.game.add.group();
-        this.walls.enableBody = true; // Enable physics for the whole group
-        this.walls.add(leftWall);
-        this.walls.add(rightWall);
+        this.infiniteModeButton = new TextButton({
+            game: this.game,
+            group: panel,
+            position: { x: -225, y: 350 },
+            scale: 0.5,
+            text: "Back",
+            callback: () => { this.togglePanel('mode'); }
+        });
 
-        leftWall.body.immovable = true;
-        leftWall.body.allowGravity = false;
 
-        rightWall.anchor.setTo(1, 0);
-        rightWall.body.immovable = true;
-        rightWall.body.allowGravity = false;
-    }
-
-    createHUD () {
-        this.score = 0;
-        this.scoreLabel = this.game.add.bitmapText(this.game.width - 10, 10, 'carrier_command', `Score: ${pad(this.score)}`, 12);
-        this.scoreLabel.anchor.setTo(1, 0);
-        this.scoreLabel.fixedToCamera = true;
-
-        this.healthLabel = this.game.add.bitmapText(10, 10, 'carrier_command', "Health: ", 12);
-        this.healthLabel.fixedToCamera = true;
-
-        this.healthIcons = this.game.add.group();
-        this.healthIcons.fixedToCamera = true;
-        for (let i = 0; i < this.player.maxHealth; i += 1) {
-            let icon = this.game.add.sprite(this.healthLabel.width + 16 + i * 18, 16, 'health_icons');
-            icon.anchor.setTo(0.5);
-            this.healthIcons.add(icon);
-        }
-        this.updateHealthHud();
-    }
-
-    toggleDebug () {
-        this.showDebug = (this.showDebug) ? false : true;
+        this.panels["level"] = panel;
     }
 }
