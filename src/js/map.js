@@ -5,7 +5,7 @@ const MAX_TILES = {
   normal:    400 * TILES_PER_CHUNK,
   insane:   1500 * TILES_PER_CHUNK,
   infinite: 5000 * TILES_PER_CHUNK
-}
+};
 
 import { Chest } from './sprite/chest';
 import { PatrolEnemy } from './sprites/enemies/patrol_enemy';
