@@ -13,7 +13,7 @@ export class PublisherState extends Phaser.State {
         tween.yoyo(true, 1000);
 
         tween.onComplete.add(() => {
-            this.game.state.start('level');
+            this.game.state.start('start');
         });
     }
 }

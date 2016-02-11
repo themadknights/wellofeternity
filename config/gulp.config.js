@@ -15,7 +15,8 @@ module.exports = {
             `${sourceFolder}/js/sprites/enemy.js`,
             `${sourceFolder}/js/sprites/**/*.js`,
             `${sourceFolder}/js/map.js`,
-            `${sourceFolder}/js/states/*.js`,
+            `${sourceFolder}/js/ui/**/*.js`,
+            `${sourceFolder}/js/states/**/*.js`,
             `${sourceFolder}/js/**/*.js`
         ],
         templates: `${sourceFolder}/templates/**/*.html`,
