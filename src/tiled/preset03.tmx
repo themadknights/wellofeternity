@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="37">
- <tileset firstgid="1" name="platform" tilewidth="32" tileheight="32" tilecount="18">
-  <image source="../images/platform.png" width="192" height="96"/>
+ <tileset firstgid="1" name="platform" tilewidth="32" tileheight="32" tilecount="48">
+  <image source="../images/platform.png" width="256" height="192"/>
  </tileset>
- <tileset firstgid="19" name="chest" tilewidth="64" tileheight="38" tilecount="2">
+ <tileset firstgid="49" name="chest" tilewidth="64" tileheight="38" tilecount="2">
   <image source="../images/chest.png" width="64" height="76"/>
  </tileset>
- <tileset firstgid="21" name="chest_small" tilewidth="32" tileheight="38" tilecount="2">
+ <tileset firstgid="51" name="chest_small" tilewidth="32" tileheight="38" tilecount="2">
   <image source="../images/chest_small.png" width="32" height="76"/>
  </tileset>
- <tileset firstgid="23" name="bat" tilewidth="50" tileheight="50" tilecount="1">
+ <tileset firstgid="53" name="bat" tilewidth="50" tileheight="50" tilecount="1">
   <tile id="0">
    <image width="50" height="50" source="../images/bat.png"/>
   </tile>
  </tileset>
  <layer name="Capa de patrones 2" width="20" height="20">
   <data encoding="csv">
-0,0,0,0,0,0,0,1,6,0,0,1,6,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,7,12,0,0,7,12,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,1,8,0,0,1,8,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,25,32,0,0,25,32,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-2,3,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-8,9,10,11,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+10,11,14,11,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,8,9,10,11,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,7,3,4,8,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,28,26,27,32,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,1,6,0,0,1,6,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,7,12,0,0,7,12,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,1,8,0,0,1,8,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,25,32,0,0,25,32,0,0,0,0,0,0,0
 </data>
  </layer>
  <objectgroup name="Capa de Objetos 1">
-  <object id="30" type="chest" gid="19" x="30" y="162" width="64" height="38"/>
-  <object id="31" type="chest" gid="19" x="555" y="417" width="64" height="38"/>
-  <object id="32" type="bat" gid="23" x="491" y="563" width="50" height="50"/>
-  <object id="33" type="bat" gid="23" x="105" y="565" width="50" height="50"/>
-  <object id="34" type="bat" gid="23" x="133" y="119" width="50" height="50"/>
-  <object id="35" type="bat" gid="23" x="425" y="118" width="50" height="50"/>
+  <object id="30" type="chest" gid="49" x="30" y="162" width="64" height="38"/>
+  <object id="31" type="chest" gid="49" x="555" y="417" width="64" height="38"/>
+  <object id="32" type="bat" gid="53" x="491" y="563" width="50" height="50"/>
+  <object id="33" type="bat" gid="53" x="105" y="565" width="50" height="50"/>
+  <object id="34" type="bat" gid="53" x="133" y="119" width="50" height="50"/>
+  <object id="35" type="bat" gid="53" x="425" y="118" width="50" height="50"/>
  </objectgroup>
 </map>
