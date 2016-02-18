@@ -32,13 +32,13 @@ export class Map extends Phaser.Tilemap {
         }
 
         //Spikes logic (Tiles: 99)
-        this.setTileIndexCallback([12,13,14,15], function(player) {
-            //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
-            if(player === this.gameState.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
-                player.loseAllHealth();
-                // console.log(player.body.velocity.y);
-            }
-        }, this);
+        // this.setTileIndexCallback([12,13,14,15], function(player) {
+        //     //PLAYER_SPIKE_VELOCITY is an epsilon for kill the player (velocity > 0 when the player hit moving in the floor)
+        //     if(player === this.gameState.player && player.body.velocity.y > PLAYER_SPIKE_VELOCITY) {
+        //         player.loseAllHealth();
+        //         // console.log(player.body.velocity.y);
+        //     }
+        // }, this);
 
         //Goal logic (Tiles: 98)
         this.setTileIndexCallback(98, function(player) {
@@ -54,7 +54,7 @@ export class Map extends Phaser.Tilemap {
         }
 
         //Replace 12 index for 12..15 randomly
-        this.replaceRandomSpikes();
+        //this.replaceRandomSpikes();
 
         // Resize world after adding chunks
         this.platforms.resizeWorld();
@@ -90,7 +90,7 @@ export class Map extends Phaser.Tilemap {
 
         this.lastChunkGenerated = y;
 
-        this.setCollisionBetween(0, 5);
+        this.setCollisionBetween(0, 47);
 
         this.chunks += 1;
         this.gameState.updateChunksHud();
